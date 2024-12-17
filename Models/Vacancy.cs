@@ -1,0 +1,17 @@
+﻿using System.Collections.Generic;
+
+namespace SoftwareCompanyApp.Models
+{
+    public class Vacancy
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Company { get; set; }
+        public string Description { get; set; }
+        public string Requirments { get; set; }
+        public string SalaryFrom { get; set; }
+        public string SalaryTo { get; set; }
+        public EmploymentType EmploymentType { get; set; }
+        public List<JobSeekerSkill> JobSeekerSkills { get; set; }
+    }
+}

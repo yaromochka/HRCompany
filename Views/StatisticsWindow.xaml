@@ -1,0 +1,58 @@
+<Page x:Class="SoftwareCompanyApp.Views.StatisticsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        mc:Ignorable="d"
+        Title="Статистика" Height="600" Width="800">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Grid.Row="0" 
+                   Text="Статистика по вакансиям и соискателям"
+                   Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                   Margin="0,0,0,20"/>
+
+        <!-- График распределения зарплат -->
+        <GroupBox Grid.Row="1" 
+                  Header="Распределение зарплат"
+                  Style="{StaticResource MaterialDesignGroupBox}"
+                  Margin="0,0,0,10">
+            <Grid>
+                <wpf:CartesianChart Series="{Binding SalaryDistribution}">
+                    <wpf:CartesianChart.AxisX>
+                        <wpf:Axis Title="Диапазон зарплат" 
+                                Labels="{Binding SalaryRanges}"/>
+                    </wpf:CartesianChart.AxisX>
+                    <wpf:CartesianChart.AxisY>
+                        <wpf:Axis Title="Количество"/>
+                    </wpf:CartesianChart.AxisY>
+                </wpf:CartesianChart>
+            </Grid>
+        </GroupBox>
+
+        <!-- График по навыкам -->
+        <GroupBox Grid.Row="2" 
+                  Header="Популярные навыки"
+                  Style="{StaticResource MaterialDesignGroupBox}">
+            <Grid>
+                <wpf:CartesianChart Series="{Binding SkillsDistribution}">
+                    <wpf:CartesianChart.AxisX>
+                        <wpf:Axis Title="Навыки" 
+                                Labels="{Binding SkillNames}"/>
+                    </wpf:CartesianChart.AxisX>
+                    <wpf:CartesianChart.AxisY>
+                        <wpf:Axis Title="Количество"/>
+                    </wpf:CartesianChart.AxisY>
+                </wpf:CartesianChart>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Page>

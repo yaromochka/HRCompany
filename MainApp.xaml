@@ -1,0 +1,15 @@
+﻿<Window x:Class="SoftwareCompanyApp.MainApp"
+
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Main Window" Height="730" Width="1020">
+    <Grid>
+        <!-- ContentControl для отображения различных экранов -->
+        <ContentControl x:Name="MainContent" Content="{Binding CurrentView}" />
+
+        <!-- Кнопка для перехода назад -->
+        <Button Content="Назад" Click="OnBackButtonClick" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10" />
+
+        <Frame Name="MainFrame" NavigationUIVisibility="Hidden" />
+    </Grid>
+</Window>

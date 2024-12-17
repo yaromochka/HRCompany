@@ -1,0 +1,234 @@
+<Page x:Class="SoftwareCompanyApp.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="clr-namespace:SoftwareCompanyApp.ViewModels"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SoftwareCompanyApp.ViewModels"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="HR Management System" Height="600" Width="1000"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Background="{DynamicResource MaterialDesignPaper}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Главное меню -->
+        <Menu Grid.Row="0" Background="{DynamicResource PrimaryHueMidBrush}">
+            <MenuItem Header="Вакансии" Foreground="White">
+                <MenuItem Header="Добавить вакансию" Foreground="MediumPurple" Command="{Binding NavigateToVacancyCommand}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="Plus"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Соискатели" Foreground="White">
+                <MenuItem Header="Добавить соискателя" Foreground="MediumPurple" Command="{Binding NavigateToJobSeekerCommand}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="AccountPlus"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <!-- Основной контент -->
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Список вакансий -->
+            <GroupBox Header="Вакансии" Grid.Column="0" Margin="0,0,5,0"
+                      Style="{DynamicResource MaterialDesignGroupBox}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Поиск вакансий -->
+                    <TextBox Grid.Row="0" Margin="0,0,0,10"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="Поиск вакансий..."
+                             Text="{Binding VacancySearchText, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <!-- Список вакансий -->
+                    <ListView Grid.Row="1" ItemsSource="{Binding Vacancies}"
+                             SelectedItem="{Binding SelectedVacancy}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Position}" 
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"/>
+                                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
+                                            <Run Text="Компания: "/>
+                                            <Run Text="{Binding Company}"/>
+                                        </TextBlock>
+                                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
+                                            <Run Text="Зарплата: "/>
+                                            <Run Text="{Binding SalaryFrom, StringFormat=C}"/>
+                                            <Run Text=" - "/>
+                                            <Run Text="{Binding SalaryTo, StringFormat=C}"/>
+                                        </TextBlock>
+                                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
+                                            <Run Text="Статус: "/>
+                                            <Run Text="{Binding IsActive}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                Command="{Binding DataContext.EditVacancyCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Редактировать">
+                                            <materialDesign:PackIcon Kind="Edit"/>
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                Command="{Binding DataContext.DeleteVacancyCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Удалить">
+                                            <materialDesign:PackIcon Kind="Delete"/>
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                Command="{Binding DataContext.FindMatchingCandidatesCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Найти кандидатов">
+                                            <materialDesign:PackIcon Kind="AccountSearch"/>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </GroupBox>
+
+            <!-- Список соискателей -->
+            <GroupBox Header="Соискатели" Grid.Column="1" Margin="5,0,0,0"
+                      Style="{DynamicResource MaterialDesignGroupBox}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Поиск соискателей -->
+                    <TextBox Grid.Row="0" Margin="0,0,0,10"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="Поиск соискателей..."
+                             Text="{Binding JobSeekerSearchText, UpdateSourceTrigger=PropertyChanged}"/>
+
+                    <!-- Список соискателей -->
+                    <ListView Grid.Row="1" ItemsSource="{Binding JobSeekers}"
+                             SelectedItem="{Binding SelectedJobSeeker}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Style="{StaticResource MaterialDesignSubtitle1TextBlock}">
+                                            <Run Text="{Binding FirstName}"/>
+                                            <Run Text=" "/>
+                                            <Run Text="{Binding LastName}"/>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Position}"
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"/>
+                                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
+                                            <Run Text="Ожидаемая зарплата: "/>
+                                            <Run Text="{Binding ExpectedSalaryFrom, StringFormat=C}"/>
+                                            <Run Text=" - "/>
+                                            <Run Text="{Binding ExpectedSalaryTo, StringFormat=C}"/>
+                                        </TextBlock>
+                                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
+                                            <Run Text="Статус: "/>
+                                            <Run Text="{Binding IsEmployed}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                Command="{Binding DataContext.EditJobSeekerCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Редактировать">
+                                            <materialDesign:PackIcon Kind="Edit"/>
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                Command="{Binding DataContext.DeleteJobSeekerCommand, 
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Удалить">
+                                            <materialDesign:PackIcon Kind="Delete"/>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <!-- Статус загрузки -->
+        <materialDesign:Card Grid.Row="2" Margin="10,5,10,10"
+                            Background="{DynamicResource MaterialDesignBackground}">
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <ProgressBar Grid.Column="0" 
+                            Style="{StaticResource MaterialDesignCircularProgressBar}"
+                            Value="0"
+                            IsIndeterminate="True"
+                            Visibility="{Binding IsLoading}"/>
+
+                <TextBlock Grid.Column="1" Margin="8,0,0,0"
+                          Text="Загрузка данных..."
+                          VerticalAlignment="Center"
+                          Visibility="{Binding IsLoading}"/>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                         Margin="0,0,8,0"
+                            Command="{Binding NavigateToStatisticsCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ChartBar" Margin="0,0,8,0"/>
+                            <TextBlock Text="Статистика"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Command="{Binding GenerateReportCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="FileReport" Margin="0,0,8,0"/>
+                            <TextBlock Text="Отчёты"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</Page>
