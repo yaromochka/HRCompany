@@ -1,35 +1,125 @@
-﻿using System;
-using System.Windows.Input;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SoftwareCompany.Helpers;
+using SoftwareCompanyApp;
+using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.Helpers;
+using SoftwareCompanyApp.Models;
+using SoftwareCompanyApp.Services;
 using SoftwareCompanyApp.Views;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
-namespace SoftwareCompanyApp.ViewModels
+public class MainViewModel
 {
-    public class MainViewModel
+    private readonly ApplicationDbContext _context;
+    public ICommand NavigateToStatisticsCommand { get; }
+    public ICommand NavigateToVacancyCommand { get; }
+    public ICommand NavigateToJobSeekerCommand { get; }
+
+    private readonly NavigationService _navigationService;
+    private readonly VacancyViewModel _vacancyViewModel;
+
+    public ObservableCollection<Vacancy> Vacancies { get; set; }
+
+    private Vacancy _selectedVacancy;
+    public Vacancy SelectedVacancy
     {
-        public ICommand NavigateToStatisticsCommand { get; }
-        public ICommand NavigateToVacancyCommand { get; }
-        public ICommand NavigateToJobSeekerCommand { get; }
-
-        private readonly NavigationService _navigationService;
-
-        public MainViewModel(NavigationService navigationService)
+        get => _selectedVacancy;
+        set
         {
-            _navigationService = navigationService;
-
-            // Команды для перехода на страницы
-            NavigateToStatisticsCommand = new RelayCommand(
-                param => _navigationService.Navigate(typeof(StatisticsWindow)),
-                param => true);
-
-            NavigateToVacancyCommand = new RelayCommand(
-                param => _navigationService.Navigate(typeof(VacancyWindow)),
-                param => true);
-
-            NavigateToJobSeekerCommand = new RelayCommand(
-                param => _navigationService.Navigate(typeof(JobSeekerWindow)),
-                param => true);
+            _selectedVacancy = value;
+            OnPropertyChanged(nameof(SelectedVacancy));
         }
+    }
+
+    public ICommand EditVacancyCommand { get; set; }
+    public ICommand DeleteVacancyCommand { get; set; }
+    public ICommand FindMatchingCandidatesCommand { get; set; }
+
+    public MainViewModel(NavigationService navigationService, VacancyViewModel vacancyViewModel, ApplicationDbContext dbContext)
+    {
+        _navigationService = navigationService;
+        _vacancyViewModel = vacancyViewModel;
+        _context = dbContext;
+
+        // Команды для перехода на страницы
+        NavigateToStatisticsCommand = new RelayCommand(
+            param => _navigationService.Navigate(typeof(StatisticsWindow)),
+            param => true);
+
+        NavigateToVacancyCommand = new RelayCommand(
+            param => _navigationService.Navigate(typeof(VacancyWindow), _vacancyViewModel), // передаем VacancyViewModel
+            param => true);
+
+        NavigateToJobSeekerCommand = new RelayCommand(
+            param => _navigationService.Navigate(typeof(JobSeekerWindow)),
+        param => true);
+
+        var vacancyService = App.ServiceProvider.GetRequiredService<VacancyService>();
+        Vacancies = vacancyService.Vacancies;
+
+        // Инициализация команд
+        EditVacancyCommand = new RelayCommand(param => EditVacancy(param as Vacancy));
+        DeleteVacancyCommand = new RelayCommand(param => DeleteVacancy(param as Vacancy));
+        FindMatchingCandidatesCommand = new RelayCommand(param => FindCandidates(param as Vacancy));
+
+        // Загрузить вакансии
+        LoadVacancies();
+    }
+
+
+    private async void LoadVacancies()
+    {
+        // Загрузка вакансий из базы данных
+        var vacancies = await Task.Run(() => _context.Vacancies.ToList());
+        Vacancies.Clear();
+
+        foreach (var vacancy in vacancies)
+        {
+            Vacancies.Add(vacancy);
+        }
+    }
+
+    private void EditVacancy(Vacancy vacancy)
+    {
+        if (vacancy != null)
+        {
+            // Логика редактирования вакансии
+        }
+    }
+
+    private void DeleteVacancy(Vacancy vacancy)
+    {
+            try
+            {
+                _context.Entry(vacancy).State = EntityState.Deleted;
+                _context.SaveChanges();
+                Vacancies.Remove(vacancy);
+            }
+            catch (Exception ex)
+            {
+                // Логирование ошибки
+                MessageBox.Show($"Error deleting vacancy: {ex.Message}");
+            }
+    }
+
+    private void FindCandidates(Vacancy vacancy)
+    {
+        if (vacancy != null)
+        {
+            // Логика поиска кандидатов
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

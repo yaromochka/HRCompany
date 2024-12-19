@@ -1,13 +1,11 @@
-using System;
-using System.Linq;
-using System.Windows;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
-using SoftwareCompanyApp.Models;
+using System.Windows;
+using System;
+using Microsoft.EntityFrameworkCore;
+using SoftwareCompanyApp.Services;
 
 namespace SoftwareCompanyApp
 {
@@ -15,11 +13,15 @@ namespace SoftwareCompanyApp
     {
         private readonly IServiceProvider _serviceProvider;
 
+        // Публичное свойство для доступа к контейнеру DI
+        public static IServiceProvider ServiceProvider { get; private set; }
+
         public App()
         {
             var services = new ServiceCollection();
             ConfigureServices(services);
             _serviceProvider = services.BuildServiceProvider();
+            ServiceProvider = _serviceProvider; // Сохраняем ссылку на сервис провайдер
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -30,6 +32,9 @@ namespace SoftwareCompanyApp
                 .Build();
 
             services.AddSingleton<IConfiguration>(configuration);
+            services.AddSingleton<VacancyService>();
+
+            services.AddTransient<VacancyViewModel>();
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationDbContext>(options =>

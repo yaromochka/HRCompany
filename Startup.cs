@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.ViewModels;
+using SoftwareCompanyApp.Views;
 using System;
 
 namespace SoftwareCompanyApp
@@ -29,11 +30,13 @@ namespace SoftwareCompanyApp
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connectionString));
 
-            // Регистрация сервисов
-
             // Регистрация ViewModels
+            services.AddTransient<JobSeekerViewModel>();
             services.AddTransient<MainViewModel>();
             services.AddTransient<StatisticsViewModel>();
+
+            // Регистрация окон (Views)
+            services.AddTransient<JobSeekerWindow>();
 
             return services.BuildServiceProvider();
         }

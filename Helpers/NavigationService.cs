@@ -27,7 +27,7 @@ namespace SoftwareCompany.Helpers
         }
 
         // Навигация на страницу
-        public void Navigate(Type pageType)
+        public void Navigate(Type pageType, object parameter = null)
         {
             if (pageType == null)
                 throw new ArgumentNullException(nameof(pageType));
@@ -36,10 +36,18 @@ namespace SoftwareCompany.Helpers
             if (CurrentPage != null)
                 _history.Push(CurrentPage);
 
-            // Создаем новую страницу и отображаем ее
+            // Создаем новую страницу и передаем параметр
             CurrentPage = (Page)Activator.CreateInstance(pageType);
+
+            // Устанавливаем DataContext для страницы (передаем параметры)
+            if (parameter != null)
+            {
+                CurrentPage.DataContext = parameter;
+            }
+
             _frame.Navigate(CurrentPage);
         }
+
 
         // Переход назад
         public void GoBack()

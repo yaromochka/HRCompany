@@ -13,6 +13,7 @@ namespace SoftwareCompanyApp.Data
             public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
             public DbSet<JobSeeker> JobSeekers { get; set; }
+            public DbSet<Vacancy> Vacancies { get; set; }
             public DbSet<EmploymentType> EmploymentTypes { get; set; }
             public DbSet<Skill> Skills { get; set; }
             public DbSet<JobSeekerSkill> JobSeekerSkills { get; set; }

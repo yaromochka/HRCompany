@@ -72,7 +72,7 @@
                                     </Grid.ColumnDefinitions>
                                     
                                     <StackPanel Grid.Column="0">
-                                        <TextBlock Text="{Binding Position}" 
+                                        <TextBlock Text="{Binding Title}" 
                                                  Style="{StaticResource MaterialDesignSubtitle1TextBlock}"/>
                                         <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
                                             <Run Text="Компания: "/>
@@ -92,17 +92,16 @@
 
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                                         <Button Style="{StaticResource MaterialDesignIconButton}"
-                                                Command="{Binding DataContext.EditVacancyCommand, 
-                                                          RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}"
-                                                ToolTip="Редактировать">
+                                        Command="{Binding DataContext.EditVacancyCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                        CommandParameter="{Binding}"
+                                        ToolTip="Редактировать">
                                             <materialDesign:PackIcon Kind="Edit"/>
                                         </Button>
+
                                         <Button Style="{StaticResource MaterialDesignIconButton}"
-                                                Command="{Binding DataContext.DeleteVacancyCommand, 
-                                                          RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}"
-                                                ToolTip="Удалить">
+                                            Command="{Binding DataContext.DeleteVacancyCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip="Удалить">
                                             <materialDesign:PackIcon Kind="Delete"/>
                                         </Button>
                                         <Button Style="{StaticResource MaterialDesignIconButton}"
@@ -199,17 +198,6 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
-                <ProgressBar Grid.Column="0" 
-                            Style="{StaticResource MaterialDesignCircularProgressBar}"
-                            Value="0"
-                            IsIndeterminate="True"
-                            Visibility="{Binding IsLoading}"/>
-
-                <TextBlock Grid.Column="1" Margin="8,0,0,0"
-                          Text="Загрузка данных..."
-                          VerticalAlignment="Center"
-                          Visibility="{Binding IsLoading}"/>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
                     <Button Style="{StaticResource MaterialDesignOutlinedButton}"
