@@ -8,14 +8,13 @@ namespace SoftwareCompanyApp.Views
 {
     public partial class MainWindow : Page
     {
-        private VacancyViewModel vacancyViewModel;
         public MainWindow(Frame MainFrame)
         {
             InitializeComponent();
 
             var navigationService = new NavigationService(MainFrame);
             var dbContext = App.ServiceProvider.GetService<ApplicationDbContext>();
-            var mainViewModel = new MainViewModel(navigationService, vacancyViewModel, dbContext);
+            var mainViewModel = new MainViewModel(navigationService, dbContext);
             DataContext = mainViewModel;
         }
     }

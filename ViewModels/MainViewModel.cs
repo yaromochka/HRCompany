@@ -23,7 +23,7 @@ public class MainViewModel
     public ICommand NavigateToJobSeekerCommand { get; }
 
     private readonly NavigationService _navigationService;
-    private readonly VacancyViewModel _vacancyViewModel;
+    private VacancyService _vacancyService;
 
     public ObservableCollection<Vacancy> Vacancies { get; set; }
 
@@ -42,10 +42,9 @@ public class MainViewModel
     public ICommand DeleteVacancyCommand { get; set; }
     public ICommand FindMatchingCandidatesCommand { get; set; }
 
-    public MainViewModel(NavigationService navigationService, VacancyViewModel vacancyViewModel, ApplicationDbContext dbContext)
+    public MainViewModel(NavigationService navigationService, ApplicationDbContext dbContext)
     {
         _navigationService = navigationService;
-        _vacancyViewModel = vacancyViewModel;
         _context = dbContext;
 
         // Команды для перехода на страницы
@@ -54,15 +53,15 @@ public class MainViewModel
             param => true);
 
         NavigateToVacancyCommand = new RelayCommand(
-            param => _navigationService.Navigate(typeof(VacancyWindow), _vacancyViewModel), // передаем VacancyViewModel
+            param => _navigationService.Navigate(typeof(VacancyWindow)), // передаем VacancyViewModel
             param => true);
 
         NavigateToJobSeekerCommand = new RelayCommand(
             param => _navigationService.Navigate(typeof(JobSeekerWindow)),
         param => true);
 
-        var vacancyService = App.ServiceProvider.GetRequiredService<VacancyService>();
-        Vacancies = vacancyService.Vacancies;
+        _vacancyService = App.ServiceProvider.GetRequiredService<VacancyService>();
+        Vacancies = _vacancyService.Vacancies;
 
         // Инициализация команд
         EditVacancyCommand = new RelayCommand(param => EditVacancy(param as Vacancy));
@@ -88,10 +87,16 @@ public class MainViewModel
 
     private void EditVacancy(Vacancy vacancy)
     {
+        var vacancyViewModel = new VacancyViewModel();
+
+        // Если вакансия не пуста, загружаем её данные
         if (vacancy != null)
         {
-            // Логика редактирования вакансии
+            vacancyViewModel.LoadVacancyData(vacancy);
         }
+
+        // Навигация с переданным ViewModel
+        _navigationService.Navigate(typeof(VacancyWindow), vacancyViewModel);
     }
 
     private void DeleteVacancy(Vacancy vacancy)

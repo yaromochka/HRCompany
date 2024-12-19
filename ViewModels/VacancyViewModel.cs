@@ -157,42 +157,60 @@ public class VacancyViewModel : INotifyPropertyChanged
     }
 
     public ICommand SaveVacancyCommand { get; set; }
+    public int _vacancyId { get; set; }
 
-    public VacancyViewModel(ApplicationDbContext dbContext)
+    public VacancyViewModel()
     {
-        _context = dbContext;
-        _vacancyService = App.ServiceProvider.GetRequiredService<VacancyService>(); ;
+        _context = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        _vacancyService = App.ServiceProvider.GetRequiredService<VacancyService>();
         // Запуск методов асинхронно, поочередно
-        LoadDataAsync();
+        _ = LoadDataAsync();
         // После загрузки данных можно инициализировать команды
         SaveVacancyCommand = new RelayCommand(param => SaveVacancy());
         AddSkillCommand = new RelayCommand(param => AddSkill());
     }
 
-    private async void LoadDataAsync()
+    private async Task LoadDataAsync()
     {
-        // Сначала загружаем типы занятости
+        // Загружаем типы занятости сначала
         await LoadEmploymentTypes();
 
         // Затем загружаем навыки
         await LoadSkills();
     }
 
-    private async Task LoadSkills()
-    {
-        // Загрузка доступных навыков из базы данных
-        var skills = await _context.Skills.ToListAsync();
-        AvailableSkills = new ObservableCollection<Skill>(skills);
-        SelectedSkills = new ObservableCollection<Skill>();  // Инициализация списка выбранных навыков
-    }
-
     private async Task LoadEmploymentTypes()
     {
-        // Получаем данные из базы данных
-        var types = await _context.EmploymentTypes.ToListAsync();
+        try
+        {
+            // Ожидаем завершения загрузки типов занятости
+            var types = await _context.EmploymentTypes.ToListAsync();
+            if (types == null || types.Count == 0)
+            {
+                MessageBox.Show("No employment types available.");
+                return;
+            }
+            EmploymentTypes = new ObservableCollection<EmploymentType>(types);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading employment types: {ex.Message}");
+        }
+    }
 
-        // Преобразуем в ObservableCollection для привязки
-        EmploymentTypes = new ObservableCollection<EmploymentType>(types);
+    private async Task LoadSkills()
+    {
+        try
+        {
+            // Ожидаем завершения загрузки навыков
+            var skills = await _context.Skills.ToListAsync();
+            AvailableSkills = new ObservableCollection<Skill>(skills);
+            SelectedSkills = new ObservableCollection<Skill>(); // Инициализация выбранных навыков
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading skills: {ex.Message}");
+        }
     }
 
 
@@ -208,7 +226,6 @@ public class VacancyViewModel : INotifyPropertyChanged
 
     private void SaveVacancy()
     {
-
         if (EmploymentTypeId == null)
         {
             MessageBox.Show("Please select a valid Employment Type.");
@@ -227,17 +244,81 @@ public class VacancyViewModel : INotifyPropertyChanged
             JobSeekerSkills = new List<JobSeekerSkill>() // Добавьте обработку навыков
         };
 
-        try
+        // Если это редактируемая вакансия, обновляем её
+        if (_vacancyId != 0) // Убедитесь, что вакансия уже существует в базе данных
         {
-            _vacancyService.AddVacancy(vacancy);
-            MessageBox.Show("Vacancy saved successfully!");
+            vacancy.Id = _vacancyId;
+            try
+            {
+                _vacancyService.UpdateVacancy(vacancy);
+                MessageBox.Show("Vacancy updated successfully!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating vacancy: {ex.Message}");
+            }
         }
-        catch (Exception ex)
+        else // Если новая вакансия
         {
-            MessageBox.Show($"Error saving vacancy: {ex.Message}");
+            try
+            {
+                _vacancyService.AddVacancy(vacancy);
+                MessageBox.Show("Vacancy saved successfully!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving vacancy: {ex.Message}");
+            }
         }
     }
 
+    public void LoadVacancyData(Vacancy vacancy)
+    {
+        if (vacancy == null)
+            return;
+
+        // Заполняем поля на основе информации о вакансии
+        _vacancyId = vacancy.Id;
+        Title = vacancy.Title;
+        Company = vacancy.Company;
+        Description = vacancy.Description;
+        Requirements = vacancy.Requirments;
+        SalaryFrom = vacancy.SalaryFrom;
+        SalaryTo = vacancy.SalaryTo;
+        EmploymentTypeId = vacancy.EmploymentTypeId;
+
+        // Загружаем тип занятости, если он не был загружен
+        if (EmploymentTypes != null && EmploymentTypes.Any())
+        {
+            var employmentType = EmploymentTypes.FirstOrDefault(et => et.Id == EmploymentTypeId);
+            if (employmentType != null)
+            {
+                EmploymentType = employmentType;
+            }
+            else
+            {
+                MessageBox.Show($"Employment type with ID {EmploymentTypeId} not found.");
+            }
+        }
+        else
+        {
+            MessageBox.Show("Employment Types are not loaded or available.");
+        }
+
+        // Загружаем выбранные навыки
+        if (vacancy.JobSeekerSkills != null)
+        {
+            SelectedSkills = new ObservableCollection<Skill>(
+                vacancy.JobSeekerSkills
+                    .Where(js => js.Skill != null) // Фильтруем элементы на null
+                    .Select(js => js.Skill)
+            );
+        }
+        else
+        {
+            SelectedSkills = new ObservableCollection<Skill>();
+        }
+    }
 
 
     public event PropertyChangedEventHandler PropertyChanged;
