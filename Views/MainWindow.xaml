@@ -144,27 +144,27 @@
                                                  Style="{StaticResource MaterialDesignBody2TextBlock}"/>
                                         <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
                                             <Run Text="Ожидаемая зарплата: "/>
-                                            <Run Text="{Binding ExpectedSalaryFrom, StringFormat=C}"/>
+                                            <Run Text="{Binding SalaryFrom}"/>
                                             <Run Text=" - "/>
-                                            <Run Text="{Binding ExpectedSalaryTo, StringFormat=C}"/>
+                                            <Run Text="{Binding SalaryTo}"/>
                                         </TextBlock>
                                         <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
-                                            <Run Text="Статус: "/>
-                                            <Run Text="{Binding IsEmployed}"/>
+                                            <Run Text="Город: "/>
+                                            <Run Text="{Binding Location}"/>
                                         </TextBlock>
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                                         <Button Style="{StaticResource MaterialDesignIconButton}"
                                                 Command="{Binding DataContext.EditJobSeekerCommand, 
-                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          RelativeSource={RelativeSource AncestorType=Page}}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip="Редактировать">
                                             <materialDesign:PackIcon Kind="Edit"/>
                                         </Button>
                                         <Button Style="{StaticResource MaterialDesignIconButton}"
                                                 Command="{Binding DataContext.DeleteJobSeekerCommand, 
-                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                          RelativeSource={RelativeSource AncestorType=Page}}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip="Удалить">
                                             <materialDesign:PackIcon Kind="Delete"/>

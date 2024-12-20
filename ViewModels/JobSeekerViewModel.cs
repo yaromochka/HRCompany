@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SoftwareCompanyApp.ViewModels
 {
@@ -114,6 +115,7 @@ namespace SoftwareCompanyApp.ViewModels
         public ICommand SaveJobSeekerCommand { get; set; }
         public ICommand AddSkillCommand { get; set; }
         public ApplicationDbContext _context;
+        public int _jobSeekerId { get; set; }
 
         public JobSeekerViewModel()
         {
@@ -149,35 +151,86 @@ namespace SoftwareCompanyApp.ViewModels
             }
         }
 
+        public void LoadJobSeekerData(JobSeeker jobSeeker)
+        {
+            if (jobSeeker != null)
+            {
+                _jobSeekerId = jobSeeker.Id;
+                FirstName = jobSeeker.FirstName;
+                LastName = jobSeeker.LastName;
+                Phone = jobSeeker.Phone;
+                Email = jobSeeker.Email;
+                Description = jobSeeker.Description;
+                Position = jobSeeker.Position;
+                Location = jobSeeker.Location;
+                SalaryFrom = jobSeeker.SalaryFrom;
+                SalaryTo = jobSeeker.SalaryTo;
+            }
+        }
+
+
         private void SaveJobSeeker()
         {
             try
             {
-                var jobSeeker = new JobSeeker
+                JobSeeker jobSeeker;
+
+                if (_jobSeekerId != 0) // Обновление существующей вакансии
                 {
-                    FirstName = _firstName,
-                    LastName = _lastName,
-                    Email = _email,
-                    Phone = _phone,
-                    Location = _location,
-                    Position = _position,
-                    Description = _description,
-                    SalaryFrom = _salaryFrom,
-                    SalaryTo = _salaryTo,
-                    IsActive = _isActive
-                };
+                    jobSeeker = _jobSeekerService.GetJobSeekerById(_jobSeekerId);
 
-                _jobSeekerService.AddJobSeeker(jobSeeker);
-                _jobSeekerService.AddJobSeekerSkills(jobSeeker.Id, SelectedSkills);
+                    if (jobSeeker == null)
+                    {
+                        MessageBox.Show("Vacancy not found for update.");
+                        return;
+                    }
 
-                MessageBox.Show("JobSeeker saved successfully!");
+                    // Обновляем данные вакансии
+                    jobSeeker.FirstName = FirstName;
+                    jobSeeker.LastName = LastName;
+                    jobSeeker.Email = Email;
+                    jobSeeker.Phone = Phone;
+                    jobSeeker.Location = Location;
+                    jobSeeker.Position = Position;
+                    jobSeeker.Description = Description;
+                    jobSeeker.SalaryFrom = SalaryFrom;
+                    jobSeeker.SalaryTo = SalaryTo;
+                    jobSeeker.IsActive = IsActive;
+
+                    // Обновляем связанные скиллы: удаляем старые и добавляем новые
+                    _jobSeekerService.UpdateJobSeekerSkills(jobSeeker.Id, SelectedSkills);
+                    _jobSeekerService.UpdateJobSeeker(jobSeeker);
+
+                    MessageBox.Show("Vacancy updated successfully!");
+                }
+                else // Создание новой вакансии
+                {
+                    jobSeeker = new JobSeeker
+                    {
+                        FirstName = _firstName,
+                        LastName = _lastName,
+                        Email = _email,
+                        Phone = _phone,
+                        Location = _location,
+                        Position = _position,
+                        Description = _description,
+                        SalaryFrom = _salaryFrom,
+                        SalaryTo = _salaryTo,
+                        IsActive = _isActive
+                    };
+
+                    _jobSeekerService.AddJobSeeker(jobSeeker);
+                    _jobSeekerService.AddJobSeekerSkills(jobSeeker.Id, SelectedSkills);
+
+                    MessageBox.Show("JobSeeker saved successfully!");
+                }
             }
             catch (Exception ex)
             {
-                // Выводим подробную информацию об ошибке
-                MessageBox.Show($"Error saving job seeker: {ex.Message}\n\nInner Exception: {ex.InnerException?.Message}");
+                MessageBox.Show($"Error saving vacancy: {ex.Message}");
             }
         }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
