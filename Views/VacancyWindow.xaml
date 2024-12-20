@@ -128,7 +128,7 @@
                                         <Button
                                             Grid.Column="1"
                                             Style="{StaticResource MaterialDesignIconButton}"
-                                            Command="{Binding DataContext.RemoveSkillCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            Command="{Binding DataContext.RemoveSkillCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                                             CommandParameter="{Binding}">
                                             <materialDesign:PackIcon Kind="Delete"/>
                                         </Button>

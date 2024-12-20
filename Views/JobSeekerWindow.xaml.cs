@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.ViewModels;
 using System.Windows.Controls;
@@ -7,11 +8,12 @@ namespace SoftwareCompanyApp.Views
 {
     public partial class JobSeekerWindow : Page
     {
-        private readonly JobSeekerViewModel _viewModel;
         public JobSeekerWindow()
         {
             InitializeComponent();
-            DataContext = _viewModel;
+            // Получаем VacancyViewModel через DI контейнер
+            var jobSeekerViewModel = App.ServiceProvider.GetRequiredService<JobSeekerViewModel>();
+            DataContext = jobSeekerViewModel;
         }
     }
 }

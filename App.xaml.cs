@@ -6,6 +6,7 @@ using System.Windows;
 using System;
 using Microsoft.EntityFrameworkCore;
 using SoftwareCompanyApp.Services;
+using SoftwareCompanyApp.ViewModels;
 
 namespace SoftwareCompanyApp
 {
@@ -33,8 +34,10 @@ namespace SoftwareCompanyApp
 
             services.AddSingleton<IConfiguration>(configuration);
             services.AddSingleton<VacancyService>();
+            services.AddSingleton<JobSeekerService>();
 
             services.AddTransient<VacancyViewModel>();
+            services.AddTransient<JobSeekerViewModel>();
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationDbContext>(options =>

@@ -1,33 +1,56 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using SoftwareCompanyApp.Data;
-using SoftwareCompanyApp.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
+using SoftwareCompanyApp.Helpers;
+using SoftwareCompanyApp.Models;
+using SoftwareCompanyApp.Services;
 using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
 namespace SoftwareCompanyApp.ViewModels
 {
     public class JobSeekerViewModel : INotifyPropertyChanged
     {
-        // Поля для JobSeeker
         private string _firstName;
         private string _lastName;
         private string _email;
         private string _phone;
         private string _description;
+        private string _location;
+        private string _position;
         private int _salaryFrom;
         private int _salaryTo;
         private bool _isActive;
 
-        private readonly ApplicationDbContext _context;
+        private readonly JobSeekerService _jobSeekerService;
+        private ObservableCollection<Skill> _availableSkills;
+        private ObservableCollection<Skill> _selectedSkills;
+        private Skill _selectedSkill;
 
-        public JobSeekerViewModel(ApplicationDbContext context)
+        public ObservableCollection<Skill> AvailableSkills
         {
-            _context = context;
+            get => _availableSkills;
+            set { _availableSkills = value; OnPropertyChanged(); }
         }
 
-        // Свойства для JobSeeker
+        public ObservableCollection<Skill> SelectedSkills
+        {
+            get => _selectedSkills;
+            set { _selectedSkills = value; OnPropertyChanged(); }
+        }
+
+        public Skill SelectedSkill
+        {
+            get => _selectedSkill;
+            set { _selectedSkill = value; OnPropertyChanged(); }
+        }
+
         public string FirstName
         {
             get => _firstName;
@@ -50,6 +73,18 @@ namespace SoftwareCompanyApp.ViewModels
         {
             get => _phone;
             set { _phone = value; OnPropertyChanged(); }
+        }
+
+        public string Location
+        {
+            get => _location;
+            set { _location = value; OnPropertyChanged(); }
+        }
+
+        public string Position
+        {
+            get => _position;
+            set { _position = value; OnPropertyChanged(); }
         }
 
         public string Description
@@ -76,51 +111,79 @@ namespace SoftwareCompanyApp.ViewModels
             set { _isActive = value; OnPropertyChanged(); }
         }
 
-        // Событие для оповещения об изменениях свойств
+        public ICommand SaveJobSeekerCommand { get; set; }
+        public ICommand AddSkillCommand { get; set; }
+        public ApplicationDbContext _context;
+
+        public JobSeekerViewModel()
+        {
+            _context = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            _jobSeekerService = App.ServiceProvider.GetRequiredService<JobSeekerService>();
+            _ = LoadData();
+            SaveJobSeekerCommand = new RelayCommand(param => SaveJobSeeker());
+            AddSkillCommand = new RelayCommand(param => AddSkill());
+        }
+
+
+        private async Task LoadData()
+        {
+            try
+            {
+                // Ожидаем завершения загрузки навыков
+                var skills = await _context.Skills.ToListAsync();
+                AvailableSkills = new ObservableCollection<Skill>(skills);
+                SelectedSkills = new ObservableCollection<Skill>(); // Инициализация выбранных навыков
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading skills: {ex.Message}");
+            }
+        }
+
+        private void AddSkill()
+        {
+            if (SelectedSkill != null && !SelectedSkills.Contains(SelectedSkill))
+            {
+                SelectedSkills.Add(SelectedSkill);
+                SelectedSkill = null;
+            }
+        }
+
+        private void SaveJobSeeker()
+        {
+            try
+            {
+                var jobSeeker = new JobSeeker
+                {
+                    FirstName = _firstName,
+                    LastName = _lastName,
+                    Email = _email,
+                    Phone = _phone,
+                    Location = _location,
+                    Position = _position,
+                    Description = _description,
+                    SalaryFrom = _salaryFrom,
+                    SalaryTo = _salaryTo,
+                    IsActive = _isActive
+                };
+
+                _jobSeekerService.AddJobSeeker(jobSeeker);
+                _jobSeekerService.AddJobSeekerSkills(jobSeeker.Id, SelectedSkills);
+
+                MessageBox.Show("JobSeeker saved successfully!");
+            }
+            catch (Exception ex)
+            {
+                // Выводим подробную информацию об ошибке
+                MessageBox.Show($"Error saving job seeker: {ex.Message}\n\nInner Exception: {ex.InnerException?.Message}");
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        // Метод для вызова события PropertyChanged
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        // Пример метода сохранения данных
-        public void SaveJobSeeker()
-        {
-            var jobSeeker = new JobSeeker
-            {
-                FirstName = _firstName,
-                LastName = _lastName,
-                Email = _email,
-                Phone = _phone,
-                Description = _description,
-                SalaryFrom = _salaryFrom,
-                SalaryTo = _salaryTo,
-                IsActive = _isActive
-            };
-
-            _context.JobSeekers.Add(jobSeeker);
-            _context.SaveChanges();
-        }
-
-        // Метод для обновления существующего JobSeeker
-        public void UpdateJobSeeker(int id)
-        {
-            var jobSeeker = _context.JobSeekers.Find(id);
-            if (jobSeeker != null)
-            {
-                jobSeeker.FirstName = _firstName;
-                jobSeeker.LastName = _lastName;
-                jobSeeker.Email = _email;
-                jobSeeker.Phone = _phone;
-                jobSeeker.Description = _description;
-                jobSeeker.SalaryFrom = _salaryFrom;
-                jobSeeker.SalaryTo = _salaryTo;
-                jobSeeker.IsActive = _isActive;
-
-                _context.SaveChanges();
-            }
         }
     }
 }
