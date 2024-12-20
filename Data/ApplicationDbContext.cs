@@ -14,6 +14,7 @@ namespace SoftwareCompanyApp.Data
 
             public DbSet<JobSeeker> JobSeekers { get; set; }
             public DbSet<Vacancy> Vacancies { get; set; }
+            public DbSet<VacancySkill> VacancySkills { get; set; }
             public DbSet<EmploymentType> EmploymentTypes { get; set; }
             public DbSet<Skill> Skills { get; set; }
             public DbSet<JobSeekerSkill> JobSeekerSkills { get; set; }

@@ -77,8 +77,8 @@ namespace SoftwareCompanyApp.Services
                 .FirstOrDefault();
 
             // Загружаем все связанные JobSeekerSkills для вакансии
-            vacancy.JobSeekerSkills = _context.JobSeekerSkills
-                .Where(js => js.JobSeekerId == vacancyId)
+            vacancy.VacancySkills = _context.VacancySkills
+                .Where(js => js.VacancyId == vacancyId)
                 .ToList();
 
             return vacancy;
@@ -96,5 +96,34 @@ namespace SoftwareCompanyApp.Services
             }
         }
 
+        public void AddVacancySkills(int vacancyId, ObservableCollection<Skill> selectedSkills)
+        {
+            var jobSeekerSkills = selectedSkills.Select(skill => new VacancySkill
+            {
+                VacancyId = vacancyId,
+                SkillId = skill.Id
+            }).ToList();
+
+            _context.VacancySkills.AddRange(jobSeekerSkills);
+            _context.SaveChanges();
+        }
+
+
+        public void UpdateVacancySkills(int vacancyId, ObservableCollection<Skill> selectedSkills)
+        {
+            // Удаляем старые скиллы
+            var existingSkills = _context.VacancySkills.Where(js => js.VacancyId == vacancyId).ToList();
+            _context.VacancySkills.RemoveRange(existingSkills);
+
+            // Добавляем новые скиллы
+            var newSkills = selectedSkills.Select(skill => new VacancySkill
+            {
+                VacancyId = vacancyId,
+                SkillId = skill.Id
+            }).ToList();
+
+            _context.VacancySkills.AddRange(newSkills);
+            _context.SaveChanges();
+        }
     }
 }

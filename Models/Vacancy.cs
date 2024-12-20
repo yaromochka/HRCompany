@@ -12,6 +12,6 @@ namespace SoftwareCompanyApp.Models
         public string SalaryFrom { get; set; }
         public string SalaryTo { get; set; }
         public int EmploymentTypeId { get; set; }
-        public List<JobSeekerSkill> JobSeekerSkills { get; set; }
+        public List<VacancySkill> VacancySkills { get; set; }
     }
 }

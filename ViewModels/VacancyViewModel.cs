@@ -232,43 +232,60 @@ public class VacancyViewModel : INotifyPropertyChanged
             return;
         }
 
-        var vacancy = new Vacancy
+        try
         {
-            Title = Title,
-            Company = Company,
-            Description = Description,
-            Requirments = Requirements,
-            SalaryFrom = SalaryFrom,
-            SalaryTo = SalaryTo,
-            EmploymentTypeId = EmploymentTypeId.Value, // Передаем ID типа работы
-            JobSeekerSkills = new List<JobSeekerSkill>() // Добавьте обработку навыков
-        };
+            Vacancy vacancy;
 
-        // Если это редактируемая вакансия, обновляем её
-        if (_vacancyId != 0) // Убедитесь, что вакансия уже существует в базе данных
-        {
-            vacancy.Id = _vacancyId;
-            try
+            if (_vacancyId != 0) // Обновление существующей вакансии
             {
+                vacancy = _vacancyService.GetVacancyById(_vacancyId);
+
+                if (vacancy == null)
+                {
+                    MessageBox.Show("Vacancy not found for update.");
+                    return;
+                }
+
+                // Обновляем данные вакансии
+                vacancy.Title = Title;
+                vacancy.Company = Company;
+                vacancy.Description = Description;
+                vacancy.Requirments = Requirements;
+                vacancy.SalaryFrom = SalaryFrom;
+                vacancy.SalaryTo = SalaryTo;
+                vacancy.EmploymentTypeId = EmploymentTypeId.Value;
+
+                // Обновляем связанные скиллы: удаляем старые и добавляем новые
+                _vacancyService.UpdateVacancySkills(vacancy.Id, SelectedSkills);
                 _vacancyService.UpdateVacancy(vacancy);
+
                 MessageBox.Show("Vacancy updated successfully!");
             }
-            catch (Exception ex)
+            else // Создание новой вакансии
             {
-                MessageBox.Show($"Error updating vacancy: {ex.Message}");
-            }
-        }
-        else // Если новая вакансия
-        {
-            try
-            {
+                vacancy = new Vacancy
+                {
+                    Title = Title,
+                    Company = Company,
+                    Description = Description,
+                    Requirments = Requirements,
+                    SalaryFrom = SalaryFrom,
+                    SalaryTo = SalaryTo,
+                    EmploymentTypeId = EmploymentTypeId.Value
+                };
+
+                // Добавляем новую вакансию и сохраняем её
                 _vacancyService.AddVacancy(vacancy);
+
+                // Теперь добавляем связанные скиллы, используя сгенерированный ID
+                _vacancyService.AddVacancySkills(vacancy.Id, SelectedSkills);
+
                 MessageBox.Show("Vacancy saved successfully!");
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error saving vacancy: {ex.Message}");
-            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error saving vacancy: {ex.Message}");
         }
     }
 
@@ -306,10 +323,10 @@ public class VacancyViewModel : INotifyPropertyChanged
         }
 
         // Загружаем выбранные навыки
-        if (vacancy.JobSeekerSkills != null)
+        if (vacancy.VacancySkills != null)
         {
             SelectedSkills = new ObservableCollection<Skill>(
-                vacancy.JobSeekerSkills
+                vacancy.VacancySkills
                     .Where(js => js.Skill != null) // Фильтруем элементы на null
                     .Select(js => js.Skill)
             );

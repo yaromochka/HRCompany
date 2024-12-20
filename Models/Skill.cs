@@ -1,18 +1,11 @@
-﻿using System;
+﻿using SoftwareCompanyApp.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SoftwareCompanyApp.Models
+public class Skill
 {
-    public class Skill
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; }
 
-        // Навигационное свойство
-        public ICollection<JobSeekerSkill> JobSeekerSkills { get; set; }
-    }
-
+    public ICollection<JobSeekerSkill> JobSeekerSkills { get; set; }
+    public ICollection<VacancySkill> VacancySkills { get; set; }
 }
