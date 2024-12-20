@@ -84,10 +84,6 @@
                                             <Run Text=" - "/>
                                             <Run Text="{Binding SalaryTo, StringFormat=C}"/>
                                         </TextBlock>
-                                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
-                                            <Run Text="Статус: "/>
-                                            <Run Text="{Binding IsActive}"/>
-                                        </TextBlock>
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
@@ -103,13 +99,6 @@
                                             CommandParameter="{Binding}"
                                             ToolTip="Удалить">
                                             <materialDesign:PackIcon Kind="Delete"/>
-                                        </Button>
-                                        <Button Style="{StaticResource MaterialDesignIconButton}"
-                                                Command="{Binding DataContext.FindMatchingCandidatesCommand, 
-                                                          RelativeSource={RelativeSource AncestorType=Window}}"
-                                                CommandParameter="{Binding}"
-                                                ToolTip="Найти кандидатов">
-                                            <materialDesign:PackIcon Kind="AccountSearch"/>
                                         </Button>
                                     </StackPanel>
                                 </Grid>
