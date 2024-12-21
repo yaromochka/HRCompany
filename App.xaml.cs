@@ -36,8 +36,11 @@ namespace SoftwareCompanyApp
             services.AddSingleton<VacancyService>();
             services.AddSingleton<JobSeekerService>();
 
+
             services.AddTransient<VacancyViewModel>();
             services.AddTransient<JobSeekerViewModel>();
+            services.AddTransient<OneJobSeekerViewModel>();
+            services.AddTransient<OneVacancyViewModel>();
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationDbContext>(options =>

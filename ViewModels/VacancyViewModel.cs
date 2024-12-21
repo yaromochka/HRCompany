@@ -156,6 +156,7 @@ public class VacancyViewModel : INotifyPropertyChanged
         }
     }
 
+
     public ICommand SaveVacancyCommand { get; set; }
     public int _vacancyId { get; set; }
 
@@ -303,6 +304,7 @@ public class VacancyViewModel : INotifyPropertyChanged
         SalaryFrom = vacancy.SalaryFrom;
         SalaryTo = vacancy.SalaryTo;
         EmploymentTypeId = vacancy.EmploymentTypeId;
+        
 
         // Загружаем тип занятости, если он не был загружен
         if (EmploymentTypes != null && EmploymentTypes.Any())

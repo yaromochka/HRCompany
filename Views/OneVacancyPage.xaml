@@ -1,0 +1,70 @@
+﻿<Page x:Class="SoftwareCompanyApp.Views.OneVacancyPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
+      Title="Вакансия"
+      Width="800" Height="600">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя панель с логотипом и заголовком -->
+        <DockPanel Grid.ColumnSpan="2" Margin="0,0,0,20">
+            <Image Source="{Binding CompanyLogo}" 
+                   Height="60" Width="60" 
+                   Margin="0,0,20,0" 
+                   VerticalAlignment="Center" />
+            <TextBlock Text="{Binding Title}" 
+                       FontSize="28" 
+                       FontWeight="Bold" 
+                       Foreground="{DynamicResource PrimaryHueMidBrush}" 
+                       VerticalAlignment="Center" />
+        </DockPanel>
+
+        <!-- Левая колонка с основной информацией -->
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="10">
+            <!-- Название компании -->
+            <TextBlock Text="Компания:" FontWeight="Bold" FontSize="18" Margin="0,0,0,5" />
+            <TextBlock Text="{Binding Company}" FontSize="16" Margin="0,0,0,10" />
+
+            <!-- Описание вакансии -->
+            <TextBlock Text="Описание вакансии:" FontWeight="Bold" FontSize="18" Margin="0,20,0,5" />
+            <TextBlock Text="{Binding Description}" FontSize="16" TextWrapping="Wrap" Margin="0,0,0,10" />
+
+            <!-- Требования -->
+            <TextBlock Text="Требования:" FontWeight="Bold" FontSize="18" Margin="0,20,0,5" />
+            <TextBlock Text="{Binding Requirments}" FontSize="16" TextWrapping="Wrap" Margin="0,0,0,10" />
+
+            <!-- Зарплата -->
+            <TextBlock Text="Зарплата:" FontWeight="Bold" FontSize="18" Margin="0,20,0,5" />
+            <TextBlock FontSize="16">
+                <Run Text="{Binding SalaryFrom}" />
+                <Run Text=" - " />
+                <Run Text="{Binding SalaryTo}" />
+            </TextBlock>
+        </StackPanel>
+
+        <!-- Правая колонка с навыками -->
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="10">
+            <TextBlock Text="Требуемые навыки:" FontWeight="Bold" FontSize="18" Margin="0,0,0,10" />
+            <Border BorderBrush="{DynamicResource PrimaryHueMidBrush}" BorderThickness="1" Padding="10" CornerRadius="5">
+                <ItemsControl ItemsSource="{Binding VacancySkills}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" FontSize="16" Margin="0,5,0,5" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+        </StackPanel>
+    </Grid>
+</Page>

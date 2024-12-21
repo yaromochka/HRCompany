@@ -24,11 +24,24 @@ namespace SoftwareCompanyApp.Data
             {
                 base.OnModelCreating(modelBuilder);
 
-                // Составной ключ для JobSeekerSkill
+                // Конфигурация связи Vacancy - Skill
+                modelBuilder.Entity<VacancySkill>()
+                    .HasKey(vs => new { vs.VacancyId, vs.SkillId });
+
+                modelBuilder.Entity<VacancySkill>()
+                    .HasOne(vs => vs.Vacancy)
+                    .WithMany(v => v.VacancySkills)
+                    .HasForeignKey(vs => vs.VacancyId);
+
+                modelBuilder.Entity<VacancySkill>()
+                    .HasOne(vs => vs.Skill)
+                    .WithMany(s => s.VacancySkills)
+                    .HasForeignKey(vs => vs.SkillId);
+
+                // Конфигурация для связи JobSeeker - Skill
                 modelBuilder.Entity<JobSeekerSkill>()
                     .HasKey(js => new { js.JobSeekerId, js.SkillId });
 
-                // Определение отношений
                 modelBuilder.Entity<JobSeekerSkill>()
                     .HasOne(js => js.JobSeeker)
                     .WithMany(j => j.JobSeekerSkills)

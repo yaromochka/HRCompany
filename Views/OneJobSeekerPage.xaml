@@ -1,0 +1,73 @@
+﻿<Page x:Class="SoftwareCompanyApp.Views.OneJobSeekerPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+      Title="Данные соискателя"
+      Width="800" Height="600">
+    <Grid Margin="31,0,0,20" HorizontalAlignment="Left" Width="749">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="244" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" MinHeight="290" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <!-- Фото соискателя -->
+        <Border Grid.Row="0" Grid.Column="0" Margin="26,20,26,86" BorderBrush="LightGray" BorderThickness="2" CornerRadius="10" RenderTransformOrigin="0.536,0.454">
+            <Image Source="{Binding Photo}" Stretch="UniformToFill" Width="180" Height="180" />
+        </Border>
+
+        <!-- Контактная информация (под фотографией) -->
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="10,10,10,10">
+            <TextBlock Text="Контактная информация:" FontWeight="Bold" FontSize="16" Margin="0,0,0,20"/>
+            <TextBlock Text="Электронная почта:" FontWeight="Bold" FontSize="21" Margin="0,0,0,10"/>
+            <TextBlock Text="{Binding Email}" FontSize="21" Margin="0,0,0,15"/>
+            <TextBlock Text="Телефон:" FontWeight="Bold" FontSize="21" Margin="0,0,0,10"/>
+            <TextBlock Text="{Binding Phone}" FontSize="21" Margin="0,0,0,15"/>
+            <TextBlock Text="Локация:" FontWeight="Bold" FontSize="21" Margin="0,0,0,10"/>
+            <TextBlock Text="{Binding Location}" FontSize="21" Margin="0,0,0,15"/>
+        </StackPanel>
+
+        <!-- Основная информация (Имя, Фамилия и Должность) -->
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="20,20,20,0">
+            <!-- Имя и фамилия (на одной строке) -->
+            <TextBlock Text="{Binding FullName}" 
+                       FontSize="46" 
+                       FontWeight="Bold" 
+                       Foreground="Black" 
+                       Width="520" Height="79" Margin="0,0,0,40" />
+
+            <!-- Должность -->
+            <TextBlock Text="{Binding Position}" 
+                       FontSize="32" 
+                       FontStyle="Italic" 
+                       Foreground="DarkGray" 
+                       Margin="0,5,0,40" />
+        </StackPanel>
+
+        <!-- Описание и дополнительные данные (в центре) -->
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="20,20,20,20">
+            <TextBlock Text="Описание:" FontWeight="Bold" FontSize="20" />
+            <TextBlock Text="{Binding Description}" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,0"/>
+
+            <TextBlock Text="Ожидаемая зарплата:" FontWeight="Bold" FontSize="20" Margin="0,20,0,0" />
+            <TextBlock FontSize="20" Margin="0,0,0,20"><Run Text="{Binding SalaryFrom}" /><Run Text=" "/><Run Text=" - " /><Run Text=" "/><Run Text="{Binding SalaryTo}" /></TextBlock>
+
+            <TextBlock Text="Навыки:" FontWeight="Bold" FontSize="20" Margin="0,10,0,10" />
+            <ItemsControl ItemsSource="{Binding AvailableSkills}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" FontSize="20" Margin="0,0,0,10"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+
+</Page>

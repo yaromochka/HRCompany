@@ -70,7 +70,7 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    
+
                                     <StackPanel Grid.Column="0">
                                         <TextBlock Text="{Binding Title}" 
                                                  Style="{StaticResource MaterialDesignSubtitle1TextBlock}"/>
@@ -87,18 +87,26 @@
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
+
                                         <Button Style="{StaticResource MaterialDesignIconButton}"
-                                        Command="{Binding DataContext.EditVacancyCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                        CommandParameter="{Binding}"
-                                        ToolTip="Редактировать">
+                                                Command="{Binding DataContext.EditVacancyCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Редактировать">
                                             <materialDesign:PackIcon Kind="Edit"/>
                                         </Button>
 
                                         <Button Style="{StaticResource MaterialDesignIconButton}"
-                                            Command="{Binding DataContext.DeleteVacancyCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                            CommandParameter="{Binding}"
-                                            ToolTip="Удалить">
+                                                Command="{Binding DataContext.DeleteVacancyCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Удалить">
                                             <materialDesign:PackIcon Kind="Delete"/>
+                                        </Button>
+
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                Command="{Binding DataContext.OpenVacancyCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="Подробнее о вакансии">
+                                            <materialDesign:PackIcon Kind="OpenInNew"/>
                                         </Button>
                                     </StackPanel>
                                 </Grid>
@@ -125,7 +133,7 @@
 
                     <!-- Список соискателей -->
                     <ListView Grid.Row="1" ItemsSource="{Binding JobSeekers}"
-                             SelectedItem="{Binding SelectedJobSeeker}">
+                             SelectedItem="{Binding SelectedJobSeeker, Mode=TwoWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -133,7 +141,7 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    
+
                                     <StackPanel Grid.Column="0">
                                         <TextBlock Style="{StaticResource MaterialDesignSubtitle1TextBlock}">
                                             <Run Text="{Binding FirstName}"/>
@@ -168,6 +176,13 @@
                                                 CommandParameter="{Binding}"
                                                 ToolTip="Удалить">
                                             <materialDesign:PackIcon Kind="Delete"/>
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                            Command="{Binding DataContext.OpenJobSeekerCommand, 
+                                              RelativeSource={RelativeSource AncestorType=Page}}"
+                            CommandParameter="{Binding}"
+                            ToolTip="Подробнее">
+                                            <materialDesign:PackIcon Kind="OpenInNew"/>
                                         </Button>
                                     </StackPanel>
                                 </Grid>

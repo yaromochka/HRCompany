@@ -56,6 +56,8 @@ public class MainViewModel
     public ICommand DeleteVacancyCommand { get; set; }
     public ICommand EditJobSeekerCommand { get; set; }
     public ICommand DeleteJobSeekerCommand { get; set; }
+    public ICommand OpenJobSeekerCommand { get; set; }
+    public ICommand OpenVacancyCommand { get; set; }
 
     public MainViewModel(NavigationService navigationService, ApplicationDbContext dbContext)
     {
@@ -87,9 +89,36 @@ public class MainViewModel
         EditJobSeekerCommand = new RelayCommand(param => EditJobSeeker(param as JobSeeker));
         DeleteJobSeekerCommand = new RelayCommand(param => DeleteJobSeeker(param as JobSeeker));
 
+        OpenJobSeekerCommand = new RelayCommand(param => OpenJobSeeker(param as JobSeeker));
+        OpenVacancyCommand = new RelayCommand(param => OpenVacancy(param as Vacancy));
+
         // Загрузить вакансии
         LoadVacancies();
         LoadJobSeekers();
+    }
+
+    private void OpenJobSeeker(JobSeeker jobSeeker)
+    {
+        var oneJobSeekerViewModel = new OneJobSeekerViewModel();
+
+        // Если вакансия не пуста, загружаем её данные
+        if (jobSeeker != null)
+        {
+            oneJobSeekerViewModel.LoadJobSeekerData(jobSeeker);
+        }
+        _navigationService.Navigate(typeof(OneJobSeekerPage), oneJobSeekerViewModel);
+    }
+
+    private void OpenVacancy(Vacancy vacancy)
+    {
+        var oneVacancyViewModel = new OneVacancyViewModel();
+
+        // Если вакансия не пуста, загружаем её данные
+        if (vacancy != null)
+        {
+            oneVacancyViewModel.LoadVacancyData(vacancy);
+        }
+        _navigationService.Navigate(typeof(OneVacancyPage), oneVacancyViewModel);
     }
 
 
