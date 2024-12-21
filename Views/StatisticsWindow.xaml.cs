@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System;
+using SoftwareCompanyApp.Models;
+using SoftwareCompanyApp.ViewModels;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Controls;
 
 namespace SoftwareCompanyApp.Views
@@ -10,11 +12,9 @@ namespace SoftwareCompanyApp.Views
         public StatisticsWindow()
         {
             InitializeComponent();
+            var _statisticsViewModel = App.ServiceProvider.GetRequiredService<StatisticsViewModel>();
+            // Установка DataContext
+            DataContext = _statisticsViewModel;
         }
-
-        //private void CloseButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    Close();
-        //}
     }
 }

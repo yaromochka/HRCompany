@@ -41,6 +41,7 @@ namespace SoftwareCompanyApp
             services.AddTransient<JobSeekerViewModel>();
             services.AddTransient<OneJobSeekerViewModel>();
             services.AddTransient<OneVacancyViewModel>();
+            services.AddTransient<StatisticsViewModel>();
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationDbContext>(options =>
