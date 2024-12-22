@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SoftwareCompany.Helpers;
 using SoftwareCompanyApp;
+using SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.Helpers;
 using SoftwareCompanyApp.Models;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-public class MainViewModel
+public class MainViewModel : INotifyPropertyChanged
 {
     private readonly ApplicationDbContext _context;
     public ICommand NavigateToStatisticsCommand { get; }
@@ -27,7 +28,33 @@ public class MainViewModel
     private VacancyService _vacancyService;
     private JobSeekerService _jobSeekerService;
 
-    public ObservableCollection<Vacancy> Vacancies { get; set; }
+    private ObservableCollection<Vacancy> _vacancies;
+    public ObservableCollection<Vacancy> Vacancies
+    {
+        get => _vacancies;
+        set
+        {
+            if (_vacancies != value)
+            {
+                _vacancies = value;
+                OnPropertyChanged(nameof(Vacancies)); // Уведомляем интерфейс об изменении
+            }
+        }
+    }
+
+    private ObservableCollection<JobSeeker> _jobSeekers;
+    public ObservableCollection<JobSeeker> JobSeekers
+    {
+        get => _jobSeekers;
+        set
+        {
+            if (_jobSeekers != value)
+            {
+                _jobSeekers = value;
+                OnPropertyChanged(nameof(JobSeekers)); // Уведомляем интерфейс об изменении
+            }
+        }
+    }
 
     private Vacancy _selectedVacancy;
     public Vacancy SelectedVacancy
@@ -40,7 +67,6 @@ public class MainViewModel
         }
     }
 
-    public ObservableCollection<JobSeeker> JobSeekers { get; set; }
 
     private JobSeeker _selectedJobSeeker;
     public JobSeeker SelectedJobSeeker
@@ -52,6 +78,39 @@ public class MainViewModel
             OnPropertyChanged(nameof(SelectedJobSeeker));
         }
     }
+
+    // Поиск
+    private string _vacancySearchText;
+    public string VacancySearchText
+    {
+        get => _vacancySearchText;
+        set
+        {
+            if (_vacancySearchText != value)
+            {
+                _vacancySearchText = value;
+                OnPropertyChanged(nameof(VacancySearchText));
+                FilterVacancies();
+            }
+        }
+    }
+
+    private string _jobSeekerSearchText;
+    public string JobSeekerSearchText
+    {
+        get => _jobSeekerSearchText;
+        set
+        {
+            if (_jobSeekerSearchText != value)
+            {
+                _jobSeekerSearchText = value;
+                OnPropertyChanged(nameof(JobSeekerSearchText));
+                FilterJobSeekers();
+            }
+        }
+    }
+
+    // Команды
     public ICommand EditVacancyCommand { get; set; }
     public ICommand DeleteVacancyCommand { get; set; }
     public ICommand EditJobSeekerCommand { get; set; }
@@ -70,12 +129,12 @@ public class MainViewModel
             param => true);
 
         NavigateToVacancyCommand = new RelayCommand(
-            param => _navigationService.Navigate(typeof(VacancyWindow)), // передаем VacancyViewModel
+            param => _navigationService.Navigate(typeof(VacancyWindow)),
             param => true);
 
         NavigateToJobSeekerCommand = new RelayCommand(
             param => _navigationService.Navigate(typeof(JobSeekerWindow)),
-        param => true);
+            param => true);
 
         _vacancyService = App.ServiceProvider.GetRequiredService<VacancyService>();
         _jobSeekerService = App.ServiceProvider.GetRequiredService<JobSeekerService>();
@@ -97,11 +156,50 @@ public class MainViewModel
         LoadJobSeekers();
     }
 
+    private void FilterVacancies()
+    {
+        // Если в поле поиска ничего не написано, показываем все вакансии
+        var filteredVacancies = string.IsNullOrWhiteSpace(_vacancySearchText)
+            ? _vacancyService.Vacancies.ToList()  // Преобразуем в List для фильтрации
+            : _vacancyService.Vacancies
+                .Where(v =>
+                    v.Title.Contains(_vacancySearchText, StringComparison.OrdinalIgnoreCase) ||
+                    v.Company.Contains(_vacancySearchText, StringComparison.OrdinalIgnoreCase) ||
+                    v.SalaryFrom.ToString().Contains(_vacancySearchText) ||
+                    v.SalaryTo.ToString().Contains(_vacancySearchText)
+                )
+                .ToList();  // Преобразуем в List после фильтрации
+
+        // Преобразуем обратно в ObservableCollection
+        Vacancies = new ObservableCollection<Vacancy>(filteredVacancies);
+    }
+
+    private void FilterJobSeekers()
+    {
+        // Если в поле поиска ничего не написано, показываем всех соискателей
+        var filteredJobSeekers = string.IsNullOrWhiteSpace(_jobSeekerSearchText)
+            ? _jobSeekerService.JobSeekers.ToList()  // Преобразуем в List для фильтрации
+            : _jobSeekerService.JobSeekers
+                .Where(js =>
+                    js.FirstName.Contains(_jobSeekerSearchText, StringComparison.OrdinalIgnoreCase) ||
+                    js.LastName.Contains(_jobSeekerSearchText, StringComparison.OrdinalIgnoreCase) ||
+                    js.Position.Contains(_jobSeekerSearchText, StringComparison.OrdinalIgnoreCase) ||
+                    js.SalaryFrom.ToString().Contains(_jobSeekerSearchText) ||
+                    js.SalaryTo.ToString().Contains(_jobSeekerSearchText) ||
+                    js.Location.Contains(_jobSeekerSearchText, StringComparison.OrdinalIgnoreCase)
+                )
+                .ToList();  // Преобразуем в List после фильтрации
+
+        // Преобразуем обратно в ObservableCollection
+        JobSeekers = new ObservableCollection<JobSeeker>(filteredJobSeekers);
+    }
+
+
     private void OpenJobSeeker(JobSeeker jobSeeker)
     {
         var oneJobSeekerViewModel = new OneJobSeekerViewModel();
 
-        // Если вакансия не пуста, загружаем её данные
+        // Если соискатель не пуст, загружаем его данные
         if (jobSeeker != null)
         {
             oneJobSeekerViewModel.LoadJobSeekerData(jobSeeker);
@@ -121,7 +219,6 @@ public class MainViewModel
         _navigationService.Navigate(typeof(OneVacancyPage), oneVacancyViewModel);
     }
 
-
     private async void LoadVacancies()
     {
         var context = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -138,7 +235,7 @@ public class MainViewModel
     private async void LoadJobSeekers()
     {
         var context = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        // Загрузка вакансий из базы данных
+        // Загрузка соискателей из базы данных
         var jobSeekers = await Task.Run(() => context.JobSeekers.ToList());
         JobSeekers.Clear();
 
@@ -164,17 +261,17 @@ public class MainViewModel
 
     private void DeleteVacancy(Vacancy vacancy)
     {
-            try
-            {
-                _context.Entry(vacancy).State = EntityState.Deleted;
-                _context.SaveChanges();
-                Vacancies.Remove(vacancy);
-            }
-            catch (Exception ex)
-            {
-                // Логирование ошибки
-                MessageBox.Show($"Error deleting vacancy: {ex.Message}");
-            }
+        try
+        {
+            _context.Entry(vacancy).State = EntityState.Deleted;
+            _context.SaveChanges();
+            Vacancies.Remove(vacancy);
+        }
+        catch (Exception ex)
+        {
+            // Логирование ошибки
+            MessageBox.Show($"Error deleting vacancy: {ex.Message}");
+        }
     }
 
     private void DeleteJobSeeker(JobSeeker jobSeeker)
@@ -188,7 +285,7 @@ public class MainViewModel
         catch (Exception ex)
         {
             // Логирование ошибки
-            MessageBox.Show($"Error deleting vacancy: {ex.Message}");
+            MessageBox.Show($"Error deleting job seeker: {ex.Message}");
         }
     }
 
@@ -196,7 +293,7 @@ public class MainViewModel
     {
         var jobSeekerViewModel = new JobSeekerViewModel();
 
-        // Если вакансия не пуста, загружаем её данные
+        // Если соискатель не пуста, загружаем его данные
         if (jobSeeker != null)
         {
             jobSeekerViewModel.LoadJobSeekerData(jobSeeker);
@@ -207,7 +304,8 @@ public class MainViewModel
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
-    private void OnPropertyChanged(string propertyName)
+
+    protected virtual void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

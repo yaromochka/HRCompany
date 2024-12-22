@@ -1,18 +1,19 @@
 <Page x:Class="SoftwareCompanyApp.Views.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:vm="clr-namespace:SoftwareCompanyApp.ViewModels"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SoftwareCompanyApp.ViewModels"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        mc:Ignorable="d"
-        Title="HR Management System" Height="600" Width="1000"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Regular"
-        TextElement.FontSize="13"
-        FontFamily="{DynamicResource MaterialDesignFont}"
-        Background="{DynamicResource MaterialDesignPaper}">
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:vm="clr-namespace:SoftwareCompanyApp.ViewModels"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="clr-namespace:SoftwareCompanyApp.ViewModels"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
+      Title="HR Management System" Height="600" Width="1000"
+      TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+      TextElement.FontWeight="Regular"
+      TextElement.FontSize="13"
+      FontFamily="{DynamicResource MaterialDesignFont}"
+      Background="{DynamicResource MaterialDesignPaper}"
+      DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -56,9 +57,9 @@
 
                     <!-- Поиск вакансий -->
                     <TextBox Grid.Row="0" Margin="0,0,0,10"
-                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                             materialDesign:HintAssist.Hint="Поиск вакансий..."
-                             Text="{Binding VacancySearchText, UpdateSourceTrigger=PropertyChanged}"/>
+         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+         materialDesign:HintAssist.Hint="Поиск вакансий..."
+         Text="{Binding VacancySearchText, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <!-- Список вакансий -->
                     <ListView Grid.Row="1" ItemsSource="{Binding Vacancies}"
@@ -127,9 +128,9 @@
 
                     <!-- Поиск соискателей -->
                     <TextBox Grid.Row="0" Margin="0,0,0,10"
-                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                             materialDesign:HintAssist.Hint="Поиск соискателей..."
-                             Text="{Binding JobSeekerSearchText, UpdateSourceTrigger=PropertyChanged}"/>
+         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+         materialDesign:HintAssist.Hint="Поиск соискателей..."
+         Text="{Binding JobSeekerSearchText, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <!-- Список соискателей -->
                     <ListView Grid.Row="1" ItemsSource="{Binding JobSeekers}"

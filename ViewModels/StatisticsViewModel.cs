@@ -1,5 +1,6 @@
 ﻿using LiveCharts;
 using LiveCharts.Wpf;
+using Microsoft.Extensions.DependencyInjection;
 using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.Models;
 using System;
@@ -71,7 +72,7 @@ namespace SoftwareCompanyApp.ViewModels
                 try
                 {
                     // Получаем контекст базы данных из ServiceProvider
-                    var dbContext = (ApplicationDbContext)App.ServiceProvider.GetService(typeof(ApplicationDbContext));
+                    var dbContext = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     if (dbContext == null)
                     {
                         throw new InvalidOperationException("Не удалось получить экземпляр ApplicationDbContext из ServiceProvider.");
