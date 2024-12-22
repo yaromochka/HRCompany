@@ -12,7 +12,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SoftwareCompanyApp.ViewModels
 {

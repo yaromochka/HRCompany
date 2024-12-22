@@ -9,8 +9,8 @@ namespace SoftwareCompanyApp.Models
         public string Company { get; set; }
         public string Description { get; set; }
         public string Requirments { get; set; }
-        public string SalaryFrom { get; set; }
-        public string SalaryTo { get; set; }
+        public int SalaryFrom { get; set; }
+        public int SalaryTo { get; set; }
         public int EmploymentTypeId { get; set; }
         public List<VacancySkill> VacancySkills { get; set; }
     }

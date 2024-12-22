@@ -104,8 +104,8 @@ namespace SoftwareCompanyApp.ViewModels
             var salaryGroups = vacancies
                 .Select(v =>
                 {
-                    int salaryFrom = int.TryParse(v.SalaryFrom, out int sf) ? sf : 0;
-                    int salaryTo = int.TryParse(v.SalaryTo, out int st) ? st : 0;
+                    int salaryFrom = v.SalaryFrom; // Значение уже int, просто присваиваем
+                    int salaryTo = v.SalaryTo;     // Значение уже int, просто присваиваем
                     return (salaryFrom + salaryTo) / 2; // Средняя зарплата
                 })
                 .GroupBy(salary => salary / 10000) // Группировка по диапазонам

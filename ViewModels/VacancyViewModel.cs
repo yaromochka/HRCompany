@@ -22,8 +22,8 @@ public class VacancyViewModel : INotifyPropertyChanged
     private string _company;
     private string _description;
     private string _requirements;
-    private string _salaryFrom;
-    private string _salaryTo;
+    private int _salaryFrom;
+    private int _salaryTo;
     private EmploymentType _employmentType;
     private int? _employmentTypeId;
     private ObservableCollection<EmploymentType> _employmentTypes;  // Используем ObservableCollection
@@ -126,7 +126,7 @@ public class VacancyViewModel : INotifyPropertyChanged
         }
     }
 
-    public string SalaryFrom
+    public int SalaryFrom
     {
         get => _salaryFrom;
         set
@@ -136,7 +136,7 @@ public class VacancyViewModel : INotifyPropertyChanged
         }
     }
 
-    public string SalaryTo
+    public int SalaryTo
     {
         get => _salaryTo;
         set

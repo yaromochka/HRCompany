@@ -11,7 +11,19 @@ namespace SoftwareCompanyApp.Services
 {
     public class VacancyService
     {
-        public ObservableCollection<Vacancy> Vacancies { get; set;  }
+        public event Action VacanciesChanged;
+
+        private ObservableCollection<Vacancy> _vacancies;
+        public ObservableCollection<Vacancy> Vacancies
+        {
+            get => _vacancies;
+            set
+            {
+                _vacancies = value;
+                VacanciesChanged?.Invoke();
+            }
+        }
+
 
         private readonly ApplicationDbContext _context;
 
@@ -27,6 +39,7 @@ namespace SoftwareCompanyApp.Services
             _context.Vacancies.Remove(vacancy);
             _context.SaveChanges();
             Vacancies.Remove(vacancy);
+            VacanciesChanged?.Invoke();
         }
 
         public void UpdateVacancy(Vacancy vacancy)
@@ -56,6 +69,7 @@ namespace SoftwareCompanyApp.Services
             _context.Vacancies.Add(vacancy);
             _context.SaveChanges();
             Vacancies.Add(vacancy);
+            VacanciesChanged?.Invoke();
         }
 
         public Vacancy GetVacancyById(int vacancyId)
@@ -94,6 +108,7 @@ namespace SoftwareCompanyApp.Services
             {
                 Vacancies.Add(vacancy);
             }
+            VacanciesChanged?.Invoke();
         }
 
         public void AddVacancySkills(int vacancyId, ObservableCollection<Skill> selectedSkills)

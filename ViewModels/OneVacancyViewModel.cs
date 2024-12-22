@@ -14,8 +14,8 @@ namespace SoftwareCompanyApp.ViewModels
         private string _company;
         private string _description;
         private string _requirments;
-        private string _salaryFrom;
-        private string _salaryTo;
+        private int _salaryFrom;
+        private int _salaryTo;
         private int _employmentTypeId;
         private ObservableCollection<VacancySkill> _vacancySkills;
 
@@ -45,13 +45,13 @@ namespace SoftwareCompanyApp.ViewModels
             set { _requirments = value; OnPropertyChanged(); }
         }
 
-        public string SalaryFrom
+        public int SalaryFrom
         {
             get => _salaryFrom;
             set { _salaryFrom = value; OnPropertyChanged(); }
         }
 
-        public string SalaryTo
+        public int SalaryTo
         {
             get => _salaryTo;
             set { _salaryTo = value; OnPropertyChanged(); }

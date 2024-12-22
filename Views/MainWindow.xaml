@@ -81,9 +81,9 @@
                                         </TextBlock>
                                         <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
                                             <Run Text="Зарплата: "/>
-                                            <Run Text="{Binding SalaryFrom, StringFormat=C}"/>
+                                            <Run Text="{Binding SalaryFrom, StringFormat={}{0:N0} ₽}"/>
                                             <Run Text=" - "/>
-                                            <Run Text="{Binding SalaryTo, StringFormat=C}"/>
+                                            <Run Text="{Binding SalaryTo, StringFormat={}{0:N0} ₽}"/>
                                         </TextBlock>
                                     </StackPanel>
 
@@ -153,9 +153,9 @@
                                                  Style="{StaticResource MaterialDesignBody2TextBlock}"/>
                                         <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
                                             <Run Text="Ожидаемая зарплата: "/>
-                                            <Run Text="{Binding SalaryFrom}"/>
+                                            <Run Text="{Binding SalaryFrom, StringFormat={}{0:N0} ₽}"/>
                                             <Run Text=" - "/>
-                                            <Run Text="{Binding SalaryTo}"/>
+                                            <Run Text="{Binding SalaryTo, StringFormat={}{0:N0} ₽}"/>
                                         </TextBlock>
                                         <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}">
                                             <Run Text="Город: "/>
