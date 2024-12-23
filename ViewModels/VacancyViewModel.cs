@@ -158,6 +158,7 @@ public class VacancyViewModel : INotifyPropertyChanged
 
 
     public ICommand SaveVacancyCommand { get; set; }
+    public ICommand RemoveSkillCommand { get; set; }
     public int _vacancyId { get; set; }
 
     public VacancyViewModel()
@@ -169,6 +170,7 @@ public class VacancyViewModel : INotifyPropertyChanged
         // После загрузки данных можно инициализировать команды
         SaveVacancyCommand = new RelayCommand(param => SaveVacancy());
         AddSkillCommand = new RelayCommand(param => AddSkill());
+        RemoveSkillCommand = new RelayCommand(param => RemoveSkill(param as Skill));
     }
 
     private async Task LoadDataAsync()
@@ -257,7 +259,7 @@ public class VacancyViewModel : INotifyPropertyChanged
                 vacancy.EmploymentTypeId = EmploymentTypeId.Value;
 
                 // Обновляем связанные скиллы: удаляем старые и добавляем новые
-                _vacancyService.UpdateVacancySkills(vacancy.Id, SelectedSkills);
+                _vacancyService.UpdateVacancySkills(vacancy.Id, SelectedSkills.ToList());
                 _vacancyService.UpdateVacancy(vacancy);
 
                 MessageBox.Show("Vacancy updated successfully!");
@@ -279,7 +281,7 @@ public class VacancyViewModel : INotifyPropertyChanged
                 _vacancyService.AddVacancy(vacancy);
 
                 // Теперь добавляем связанные скиллы, используя сгенерированный ID
-                _vacancyService.AddVacancySkills(vacancy.Id, SelectedSkills);
+                _vacancyService.AddVacancySkills(vacancy.Id, SelectedSkills.ToList());
 
                 MessageBox.Show("Vacancy saved successfully!");
             }
@@ -292,50 +294,58 @@ public class VacancyViewModel : INotifyPropertyChanged
 
     public void LoadVacancyData(Vacancy vacancy)
     {
-        if (vacancy == null)
-            return;
-
-        // Заполняем поля на основе информации о вакансии
-        _vacancyId = vacancy.Id;
-        Title = vacancy.Title;
-        Company = vacancy.Company;
-        Description = vacancy.Description;
-        Requirements = vacancy.Requirments;
-        SalaryFrom = vacancy.SalaryFrom;
-        SalaryTo = vacancy.SalaryTo;
-        EmploymentTypeId = vacancy.EmploymentTypeId;
-        
-
-        // Загружаем тип занятости, если он не был загружен
-        if (EmploymentTypes != null && EmploymentTypes.Any())
+        try
         {
-            var employmentType = EmploymentTypes.FirstOrDefault(et => et.Id == EmploymentTypeId);
-            if (employmentType != null)
+            if (vacancy == null)
             {
-                EmploymentType = employmentType;
+                MessageBox.Show("Vacancy not found.");
+                return;
+            }
+
+            // Заполняем свойства ViewModel на основе данных вакансии
+            _vacancyId = vacancy.Id;
+            Title = vacancy.Title;
+            Company = vacancy.Company;
+            Description = vacancy.Description;
+            Requirements = vacancy.Requirments;
+            SalaryFrom = vacancy.SalaryFrom;
+            SalaryTo = vacancy.SalaryTo;
+            EmploymentTypeId = vacancy.EmploymentTypeId;
+
+            // Устанавливаем список выбранных навыков, если они есть
+            if (vacancy.VacancySkills != null && vacancy.VacancySkills.Any())
+            {
+                var skills = vacancy.VacancySkills.Select(vs => vs.Skill).Where(skill => skill != null).ToList();
+                SelectedSkills = new ObservableCollection<Skill>(skills);
+                Console.WriteLine($"Loaded {skills.Count} skills");
             }
             else
             {
-                MessageBox.Show($"Employment type with ID {EmploymentTypeId} not found.");
+                SelectedSkills = new ObservableCollection<Skill>();
+                Console.WriteLine("No skills loaded");
+            }
+
+            // Загружаем тип занятости
+            if (EmploymentTypes != null && EmploymentTypes.Any())
+            {
+                var employmentType = EmploymentTypes.FirstOrDefault(et => et.Id == EmploymentTypeId);
+                EmploymentType = employmentType ?? throw new Exception($"Employment type with ID {EmploymentTypeId} not found.");
+            }
+            else
+            {
+                MessageBox.Show("Employment Types are not loaded or available.");
             }
         }
-        else
+        catch (Exception ex)
         {
-            MessageBox.Show("Employment Types are not loaded or available.");
+            MessageBox.Show($"Error loading vacancy data: {ex.Message}");
         }
-
-        // Загружаем выбранные навыки
-        if (vacancy.VacancySkills != null)
+    }
+    private void RemoveSkill(Skill skill)
+    {
+        if (skill != null && SelectedSkills.Contains(skill))
         {
-            SelectedSkills = new ObservableCollection<Skill>(
-                vacancy.VacancySkills
-                    .Where(js => js.Skill != null) // Фильтруем элементы на null
-                    .Select(js => js.Skill)
-            );
-        }
-        else
-        {
-            SelectedSkills = new ObservableCollection<Skill>();
+            SelectedSkills.Remove(skill);
         }
     }
 

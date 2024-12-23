@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SoftwareCompanyApp.Models
 {
@@ -12,6 +13,7 @@ namespace SoftwareCompanyApp.Models
         public int SalaryFrom { get; set; }
         public int SalaryTo { get; set; }
         public int EmploymentTypeId { get; set; }
-        public List<VacancySkill> VacancySkills { get; set; }
+        // Добавляем коллекцию скиллов
+        public ICollection<VacancySkill> VacancySkills { get; set; } = new List<VacancySkill>();
     }
 }

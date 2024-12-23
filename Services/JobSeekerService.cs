@@ -44,7 +44,6 @@ namespace SoftwareCompanyApp.Services
                 existingJobSeeker.Position = jobSeeker.Position;
                 existingJobSeeker.SalaryFrom = jobSeeker.SalaryFrom;
                 existingJobSeeker.SalaryTo = jobSeeker.SalaryTo;
-                existingJobSeeker.IsActive = jobSeeker.IsActive;
 
                 _context.JobSeekers.Attach(existingJobSeeker);
                 _context.Entry(existingJobSeeker).State = EntityState.Modified;

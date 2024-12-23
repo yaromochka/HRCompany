@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SoftwareCompanyApp.Models
 {
@@ -15,9 +16,15 @@ namespace SoftwareCompanyApp.Models
         public int SalaryFrom { get; set; }
         public int SalaryTo { get; set; }
 
-        // Навигационное свойство
+        // Добавляем коллекцию скиллов
         public ICollection<JobSeekerSkill> JobSeekerSkills { get; set; }
-        public bool IsActive { get; set; }
+        public ICollection<Skill> Skills
+        {
+            get
+            {
+                return JobSeekerSkills?.Select(js => js.Skill).ToList();
+            }
+        }
     }
 
 }

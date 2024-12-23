@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.Models;
 using SoftwareCompanyApp.Services;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace SoftwareCompanyApp.ViewModels
@@ -18,6 +22,7 @@ namespace SoftwareCompanyApp.ViewModels
         private int _salaryTo;
         private int _employmentTypeId;
         private ObservableCollection<VacancySkill> _vacancySkills;
+        private ObservableCollection<Skill> _skillsList;
 
         private readonly VacancyService _vacancyService;
 
@@ -66,11 +71,34 @@ namespace SoftwareCompanyApp.ViewModels
         public ObservableCollection<VacancySkill> VacancySkills
         {
             get => _vacancySkills;
-            set { _vacancySkills = value; OnPropertyChanged(); }
+            set
+            {
+                if (!ReferenceEquals(_vacancySkills, value))
+                {
+                    _vacancySkills = value;
+                    UpdateSkills(); // Обновляем SkillsList при изменении VacancySkills
+                }
+            }
         }
+        public ObservableCollection<Skill> SkillsList
+        {
+            get => _skillsList;
+            set
+            {
+                if (!ReferenceEquals(_skillsList, value))
+                {
+                    _skillsList = value;
+                    Debug.WriteLine($"SkillsList updated. Count: {_skillsList?.Count ?? 0}");
+                    OnPropertyChanged(nameof(SkillsList));
+                }
+            }
+        }
+
+        private ApplicationDbContext _dbContext;
 
         public OneVacancyViewModel()
         {
+            _dbContext = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             _vacancyService = App.ServiceProvider.GetRequiredService<VacancyService>();
             VacancySkills = new ObservableCollection<VacancySkill>();
         }
@@ -86,9 +114,38 @@ namespace SoftwareCompanyApp.ViewModels
                 SalaryFrom = vacancy.SalaryFrom;
                 SalaryTo = vacancy.SalaryTo;
                 EmploymentTypeId = vacancy.EmploymentTypeId;
-                VacancySkills = new ObservableCollection<VacancySkill>(vacancy.VacancySkills ?? new List<VacancySkill>());
+
+                // Загружаем связанные навыки
+                var vacancySkills = _dbContext.VacancySkills
+                    .Where(vs => vs.VacancyId == vacancy.Id)
+                    .Include(vs => vs.Skill) // если необходимо
+                    .ToList();
+
+                // Преобразуем их в коллекцию Skills
+                SkillsList = new ObservableCollection<Skill>(
+                    vacancySkills.Where(vs => vs.Skill != null).Select(vs => vs.Skill)
+                );
+
+                Debug.WriteLine($"SkillsList updated. Count: {SkillsList.Count}");
             }
         }
+
+
+        private void UpdateSkills()
+        {
+            if (VacancySkills != null)
+            {
+                SkillsList = new ObservableCollection<Skill>(
+                    VacancySkills.Where(vs => vs.Skill != null).Select(vs => vs.Skill)
+                );
+            }
+            else
+            {
+                SkillsList = new ObservableCollection<Skill>();
+            }
+        }
+
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 

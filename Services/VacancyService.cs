@@ -2,6 +2,7 @@
 using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.Models;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -111,34 +112,29 @@ namespace SoftwareCompanyApp.Services
             VacanciesChanged?.Invoke();
         }
 
-        public void AddVacancySkills(int vacancyId, ObservableCollection<Skill> selectedSkills)
+        public void AddVacancySkills(int vacancyId, List<Skill> skills)
         {
-            var jobSeekerSkills = selectedSkills.Select(skill => new VacancySkill
+            foreach (var skill in skills)
             {
-                VacancyId = vacancyId,
-                SkillId = skill.Id
-            }).ToList();
-
-            _context.VacancySkills.AddRange(jobSeekerSkills);
+                var vacancySkill = new VacancySkill
+                {
+                    VacancyId = vacancyId,
+                    SkillId = skill.Id
+                };
+                _context.VacancySkills.Add(vacancySkill);
+            }
             _context.SaveChanges();
         }
 
 
-        public void UpdateVacancySkills(int vacancyId, ObservableCollection<Skill> selectedSkills)
+        public void UpdateVacancySkills(int vacancyId, List<Skill> skills)
         {
-            // Удаляем старые скиллы
-            var existingSkills = _context.VacancySkills.Where(js => js.VacancyId == vacancyId).ToList();
+            // Удаляем старые навыки
+            var existingSkills = _context.VacancySkills.Where(vs => vs.VacancyId == vacancyId).ToList();
             _context.VacancySkills.RemoveRange(existingSkills);
 
-            // Добавляем новые скиллы
-            var newSkills = selectedSkills.Select(skill => new VacancySkill
-            {
-                VacancyId = vacancyId,
-                SkillId = skill.Id
-            }).ToList();
-
-            _context.VacancySkills.AddRange(newSkills);
-            _context.SaveChanges();
+            // Добавляем новые навыки
+            AddVacancySkills(vacancyId, skills);
         }
     }
 }

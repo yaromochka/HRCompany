@@ -26,7 +26,6 @@ namespace SoftwareCompanyApp.ViewModels
         private string _position;
         private int _salaryFrom;
         private int _salaryTo;
-        private bool _isActive;
 
         private readonly JobSeekerService _jobSeekerService;
         private ObservableCollection<Skill> _availableSkills;
@@ -103,12 +102,6 @@ namespace SoftwareCompanyApp.ViewModels
         {
             get => _salaryTo;
             set { _salaryTo = value; OnPropertyChanged(); }
-        }
-
-        public bool IsActive
-        {
-            get => _isActive;
-            set { _isActive = value; OnPropertyChanged(); }
         }
 
         public ICommand SaveJobSeekerCommand { get; set; }
@@ -194,7 +187,6 @@ namespace SoftwareCompanyApp.ViewModels
                     jobSeeker.Description = Description;
                     jobSeeker.SalaryFrom = SalaryFrom;
                     jobSeeker.SalaryTo = SalaryTo;
-                    jobSeeker.IsActive = IsActive;
 
                     // Обновляем связанные скиллы: удаляем старые и добавляем новые
                     _jobSeekerService.UpdateJobSeekerSkills(jobSeeker.Id, SelectedSkills);
@@ -215,7 +207,6 @@ namespace SoftwareCompanyApp.ViewModels
                         Description = _description,
                         SalaryFrom = _salaryFrom,
                         SalaryTo = _salaryTo,
-                        IsActive = _isActive
                     };
 
                     _jobSeekerService.AddJobSeeker(jobSeeker);
