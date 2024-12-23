@@ -60,13 +60,20 @@
             <TextBlock FontSize="20" Margin="0,0,0,20"><Run Text="{Binding SalaryFrom}" /><Run Text=" "/><Run Text=" - " /><Run Text=" "/><Run Text="{Binding SalaryTo}" /></TextBlock>
 
             <TextBlock Text="Навыки:" FontWeight="Bold" FontSize="20" Margin="0,10,0,10" />
-            <ItemsControl ItemsSource="{Binding AvailableSkills}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}" FontSize="20" Margin="0,0,0,10"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding SelectedSkills}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" FontSize="20" Margin="0,0,10,10"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </StackPanel>
     </Grid>
 

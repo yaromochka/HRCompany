@@ -25,18 +25,11 @@ namespace SoftwareCompanyApp.ViewModels
         private string _position;
         private int _salaryFrom;
         private int _salaryTo;
-        private bool _isActive;
 
         private readonly JobSeekerService _jobSeekerService;
-        private ObservableCollection<Skill> _availableSkills;
         private ObservableCollection<Skill> _selectedSkills;
         private Skill _selectedSkill;
 
-        public ObservableCollection<Skill> AvailableSkills
-        {
-            get => _availableSkills;
-            set { _availableSkills = value; OnPropertyChanged(); }
-        }
 
         public ObservableCollection<Skill> SelectedSkills
         {
@@ -104,22 +97,13 @@ namespace SoftwareCompanyApp.ViewModels
             set { _salaryTo = value; OnPropertyChanged(); }
         }
 
-        public bool IsActive
-        {
-            get => _isActive;
-            set { _isActive = value; OnPropertyChanged(); }
-        }
-
-        public string FullName
-        {
-            get => $"{FirstName} {LastName}";
-        }
+        public string FullName => $"{FirstName} {LastName}";
 
         public OneJobSeekerViewModel()
         {
             _jobSeekerService = App.ServiceProvider.GetRequiredService<JobSeekerService>();
+            SelectedSkills = new ObservableCollection<Skill>();
         }
-
 
         public void LoadJobSeekerData(JobSeeker jobSeeker)
         {
@@ -134,8 +118,29 @@ namespace SoftwareCompanyApp.ViewModels
                 Location = jobSeeker.Location;
                 SalaryFrom = jobSeeker.SalaryFrom;
                 SalaryTo = jobSeeker.SalaryTo;
+
+                // Загружаем связанные навыки
+                LoadJobSeekerSkills(jobSeeker.Id);
             }
         }
+
+        private void LoadJobSeekerSkills(int jobSeekerId)
+        {
+            // Получаем dbContext из контейнера DI (не уничтожаем его вручную)
+            var dbContext = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            // Загружаем связанные навыки через JobSeekerSkills
+            var jobSeekerSkills = dbContext.JobSeekerSkills
+                .Where(js => js.JobSeekerId == jobSeekerId)
+                .Include(js => js.Skill) // Убедитесь, что связанные Skill загружаются
+                .ToList();
+
+            // Преобразуем их в коллекцию SelectedSkills
+            SelectedSkills = new ObservableCollection<Skill>(
+                jobSeekerSkills.Where(js => js.Skill != null).Select(js => js.Skill)
+            );
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
