@@ -139,12 +139,6 @@
                         </ListView>
                     </Grid>
                 </GroupBox>
-
-                <CheckBox
-                    Style="{StaticResource MaterialDesignCheckBox}"
-                    Content="Активна"
-                    IsChecked="{Binding IsActive}"
-                    Margin="0,0,0,10"/>
             </StackPanel>
         </ScrollViewer>
 

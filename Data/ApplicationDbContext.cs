@@ -25,6 +25,12 @@ namespace SoftwareCompanyApp.Data
                 base.OnModelCreating(modelBuilder);
 
                 // Конфигурация связи Vacancy - Skill
+                modelBuilder.Entity<Vacancy>()
+                    .HasMany(v => v.VacancySkills)
+                    .WithOne(vs => vs.Vacancy)
+                    .HasForeignKey(vs => vs.VacancyId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
                 modelBuilder.Entity<VacancySkill>()
                     .HasKey(vs => new { vs.VacancyId, vs.SkillId });
 

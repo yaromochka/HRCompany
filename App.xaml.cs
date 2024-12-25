@@ -44,11 +44,10 @@ namespace SoftwareCompanyApp
             services.AddTransient<StatisticsViewModel>();
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(connectionString, npgsqlOptions =>
-                    npgsqlOptions.EnableRetryOnFailure())
-                       .LogTo(Console.WriteLine, LogLevel.Information)
-                       .EnableSensitiveDataLogging());
+            services.AddScoped<ApplicationDbContext>(provider =>
+                new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>()
+                    .UseNpgsql(connectionString)
+                    .Options));
 
             services.AddLogging(builder =>
             {

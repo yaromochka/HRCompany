@@ -75,8 +75,9 @@ namespace SoftwareCompanyApp.Services
 
         public Vacancy GetVacancyById(int vacancyId)
         {
-            // Получаем вакансию по ID
             var vacancy = _context.Vacancies
+                .Include(v => v.VacancySkills)
+                .ThenInclude(vs => vs.Skill)  // Загружаем связанные скиллы 
                 .FirstOrDefault(v => v.Id == vacancyId);
 
             if (vacancy == null)
@@ -85,19 +86,9 @@ namespace SoftwareCompanyApp.Services
                 return null;
             }
 
-            // Загружаем EmploymentType по Id вакансии
-            vacancy.EmploymentTypeId = _context.EmploymentTypes
-                .Where(et => et.Id == vacancy.EmploymentTypeId)
-                .Select(et => et.Id)
-                .FirstOrDefault();
-
-            // Загружаем все связанные JobSeekerSkills для вакансии
-            vacancy.VacancySkills = _context.VacancySkills
-                .Where(js => js.VacancyId == vacancyId)
-                .ToList();
-
             return vacancy;
         }
+
 
         public async Task ReloadVacancies()
         {
@@ -123,8 +114,9 @@ namespace SoftwareCompanyApp.Services
                 };
                 _context.VacancySkills.Add(vacancySkill);
             }
-            _context.SaveChanges();
+            _context.SaveChanges(); // Сохраняем изменения в базе данных
         }
+
 
 
         public void UpdateVacancySkills(int vacancyId, List<Skill> skills)
@@ -134,7 +126,18 @@ namespace SoftwareCompanyApp.Services
             _context.VacancySkills.RemoveRange(existingSkills);
 
             // Добавляем новые навыки
-            AddVacancySkills(vacancyId, skills);
+            foreach (var skill in skills)
+            {
+                var vacancySkill = new VacancySkill
+                {
+                    VacancyId = vacancyId,
+                    SkillId = skill.Id
+                };
+                _context.VacancySkills.Add(vacancySkill);
+            }
+
+            _context.SaveChanges(); // Сохраняем изменения в базе данных
         }
+
     }
 }

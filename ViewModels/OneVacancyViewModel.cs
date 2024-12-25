@@ -125,8 +125,6 @@ namespace SoftwareCompanyApp.ViewModels
                 SkillsList = new ObservableCollection<Skill>(
                     vacancySkills.Where(vs => vs.Skill != null).Select(vs => vs.Skill)
                 );
-
-                Debug.WriteLine($"SkillsList updated. Count: {SkillsList.Count}");
             }
         }
 

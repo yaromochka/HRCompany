@@ -15,6 +15,7 @@ using System.Windows;
 using SoftwareCompanyApp.Services;
 using SoftwareCompanyApp;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 public class VacancyViewModel : INotifyPropertyChanged
 {
@@ -29,6 +30,7 @@ public class VacancyViewModel : INotifyPropertyChanged
     private ObservableCollection<EmploymentType> _employmentTypes;  // Используем ObservableCollection
 
     private readonly ApplicationDbContext _context;
+    private readonly ApplicationDbContext _skillContext;
     private VacancyService _vacancyService;
     private ObservableCollection<Skill> _availableSkills;
     private ObservableCollection<Skill> _selectedSkills;
@@ -164,6 +166,7 @@ public class VacancyViewModel : INotifyPropertyChanged
     public VacancyViewModel()
     {
         _context = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        _skillContext = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         _vacancyService = App.ServiceProvider.GetRequiredService<VacancyService>();
         // Запуск методов асинхронно, поочередно
         _ = LoadDataAsync();
@@ -208,7 +211,11 @@ public class VacancyViewModel : INotifyPropertyChanged
             // Ожидаем завершения загрузки навыков
             var skills = await _context.Skills.ToListAsync();
             AvailableSkills = new ObservableCollection<Skill>(skills);
-            SelectedSkills = new ObservableCollection<Skill>(); // Инициализация выбранных навыков
+            if (SelectedSkills == null || !SelectedSkills.Any())
+            {
+                // Если пустая или еще не была инициализирована, инициализируем коллекцию
+                SelectedSkills = new ObservableCollection<Skill>();
+            }
         }
         catch (Exception ex)
         {
@@ -312,18 +319,15 @@ public class VacancyViewModel : INotifyPropertyChanged
             SalaryTo = vacancy.SalaryTo;
             EmploymentTypeId = vacancy.EmploymentTypeId;
 
-            // Устанавливаем список выбранных навыков, если они есть
-            if (vacancy.VacancySkills != null && vacancy.VacancySkills.Any())
-            {
-                var skills = vacancy.VacancySkills.Select(vs => vs.Skill).Where(skill => skill != null).ToList();
-                SelectedSkills = new ObservableCollection<Skill>(skills);
-                Console.WriteLine($"Loaded {skills.Count} skills");
-            }
-            else
-            {
-                SelectedSkills = new ObservableCollection<Skill>();
-                Console.WriteLine("No skills loaded");
-            }
+            var vacancySkills = _skillContext.VacancySkills
+                .Where(vs => vs.VacancyId == vacancy.Id)
+                .Include(vs => vs.Skill) // если необходимо
+                .ToList();
+
+            // Преобразуем их в коллекцию Skills
+            SelectedSkills = new ObservableCollection<Skill>(
+                vacancySkills.Where(vs => vs.Skill != null).Select(vs => vs.Skill)
+            );
 
             // Загружаем тип занятости
             if (EmploymentTypes != null && EmploymentTypes.Any())
