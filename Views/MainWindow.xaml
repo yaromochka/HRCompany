@@ -213,13 +213,6 @@
                             <TextBlock Text="Статистика"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource MaterialDesignOutlinedButton}"
-                            Command="{Binding GenerateReportCommand}">
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="FileReport" Margin="0,0,8,0"/>
-                            <TextBlock Text="Отчёты"/>
-                        </StackPanel>
-                    </Button>
                 </StackPanel>
             </Grid>
         </materialDesign:Card>

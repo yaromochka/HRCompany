@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.Data.SoftwareCompanyApp.Data;
 using SoftwareCompanyApp.Helpers;
 using SoftwareCompanyApp.Models;
@@ -7,6 +8,7 @@ using SoftwareCompanyApp.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -31,6 +33,9 @@ namespace SoftwareCompanyApp.ViewModels
         private ObservableCollection<Skill> _availableSkills;
         private ObservableCollection<Skill> _selectedSkills;
         private Skill _selectedSkill;
+
+        private ApplicationDbContext _context;
+        private int _jobSeekerId;
 
         public ObservableCollection<Skill> AvailableSkills
         {
@@ -106,27 +111,32 @@ namespace SoftwareCompanyApp.ViewModels
 
         public ICommand SaveJobSeekerCommand { get; set; }
         public ICommand AddSkillCommand { get; set; }
-        public ApplicationDbContext _context;
-        public int _jobSeekerId { get; set; }
+        public ICommand RemoveSkillCommand { get; set; }
 
         public JobSeekerViewModel()
         {
             _context = App.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             _jobSeekerService = App.ServiceProvider.GetRequiredService<JobSeekerService>();
-            _ = LoadData();
             SaveJobSeekerCommand = new RelayCommand(param => SaveJobSeeker());
             AddSkillCommand = new RelayCommand(param => AddSkill());
-        }
+            RemoveSkillCommand = new RelayCommand(param => RemoveSkill(param as Skill));
 
+            // Инициализация
+            _ = LoadData();
+        }
 
         private async Task LoadData()
         {
             try
             {
-                // Ожидаем завершения загрузки навыков
+                // Ожидаем завершения загрузки всех доступных скиллов
                 var skills = await _context.Skills.ToListAsync();
                 AvailableSkills = new ObservableCollection<Skill>(skills);
-                SelectedSkills = new ObservableCollection<Skill>(); // Инициализация выбранных навыков
+                if (SelectedSkills == null || !SelectedSkills.Any())
+                {
+                    // Если пустая или еще не была инициализирована, инициализируем коллекцию
+                    SelectedSkills = new ObservableCollection<Skill>();
+                }
             }
             catch (Exception ex)
             {
@@ -140,6 +150,14 @@ namespace SoftwareCompanyApp.ViewModels
             {
                 SelectedSkills.Add(SelectedSkill);
                 SelectedSkill = null;
+            }
+        }
+
+        private void RemoveSkill(Skill skill)
+        {
+            if (skill != null && SelectedSkills.Contains(skill))
+            {
+                SelectedSkills.Remove(skill);
             }
         }
 
@@ -157,9 +175,17 @@ namespace SoftwareCompanyApp.ViewModels
                 Location = jobSeeker.Location;
                 SalaryFrom = jobSeeker.SalaryFrom;
                 SalaryTo = jobSeeker.SalaryTo;
+
+                // Загружаем скиллы для JobSeeker
+                var selectedSkills = _context.JobSeekerSkills
+                    .Where(js => js.JobSeekerId == _jobSeekerId)
+                    .Include(js => js.Skill)
+                    .Select(js => js.Skill)
+                    .ToList();
+
+                SelectedSkills = new ObservableCollection<Skill>(selectedSkills);
             }
         }
-
 
         private void SaveJobSeeker()
         {
@@ -167,17 +193,17 @@ namespace SoftwareCompanyApp.ViewModels
             {
                 JobSeeker jobSeeker;
 
-                if (_jobSeekerId != 0) // Обновление существующей вакансии
+                if (_jobSeekerId != 0) // Обновление существующего JobSeeker
                 {
                     jobSeeker = _jobSeekerService.GetJobSeekerById(_jobSeekerId);
 
                     if (jobSeeker == null)
                     {
-                        MessageBox.Show("Vacancy not found for update.");
+                        MessageBox.Show("JobSeeker not found for update.");
                         return;
                     }
 
-                    // Обновляем данные вакансии
+                    // Обновляем данные JobSeeker
                     jobSeeker.FirstName = FirstName;
                     jobSeeker.LastName = LastName;
                     jobSeeker.Email = Email;
@@ -192,9 +218,9 @@ namespace SoftwareCompanyApp.ViewModels
                     _jobSeekerService.UpdateJobSeekerSkills(jobSeeker.Id, SelectedSkills);
                     _jobSeekerService.UpdateJobSeeker(jobSeeker);
 
-                    MessageBox.Show("Vacancy updated successfully!");
+                    MessageBox.Show("JobSeeker updated successfully!");
                 }
-                else // Создание новой вакансии
+                else // Создание нового JobSeeker
                 {
                     jobSeeker = new JobSeeker
                     {
@@ -217,10 +243,9 @@ namespace SoftwareCompanyApp.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving vacancy: {ex.Message}");
+                MessageBox.Show($"Error saving JobSeeker: {ex.Message}");
             }
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
 
